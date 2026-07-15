@@ -1,0 +1,1027 @@
+<title>Trackside — SPC Capability Speedway</title>
+<style>
+  .sp-root {
+    --plane:      #0A0C10;
+    --panel:      #12151B;
+    --panel-2:    #171B22;
+    --panel-3:    #1D222B;
+    --text-primary:   #F3F1E8;
+    --text-secondary: #9BA3AE;
+    --text-muted:     #626A76;
+    --border:         rgba(243,241,232,0.08);
+    --border-strong:  rgba(243,241,232,0.16);
+
+    --accent:     #35C7DA;
+    --accent-ink: #06181B;
+    --accent-2:   #E8A23A;
+
+    --road:       #2B2E33;
+    --shoulder:   #14201A;
+    --shoulder-2: #0F1712;
+    --paint:      #E7E3D6;
+    --curb-a:     #D9433B;
+    --curb-b:     #F3F1E8;
+
+    --good:       #4fd44f;
+    --warning:    #e0a733;
+    --serious:    #ec835a;
+    --critical:   #e05c5c;
+    --good-bg:     rgba(79,212,79,0.14);
+    --warning-bg:  rgba(224,167,51,0.14);
+    --serious-bg:  rgba(236,131,90,0.14);
+    --critical-bg: rgba(224,92,92,0.14);
+
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  .sp-root {
+    background:
+      radial-gradient(ellipse at 50% -10%, #16202A 0%, var(--plane) 55%);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: clamp(18px, 3.5vw, 40px);
+    min-height: 100%;
+  }
+
+  .sp-shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  /* ---------- Header ---------- */
+  .sp-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .sp-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 6px;
+  }
+  .sp-title {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: clamp(24px, 3.4vw, 32px);
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .sp-subtitle {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    margin: 6px 0 0;
+    max-width: 46ch;
+  }
+  .sp-stats {
+    font-family: var(--font-mono);
+    display: flex;
+    gap: 22px;
+  }
+  .sp-stat { text-align: right; }
+  .sp-stat .n { font-size: 26px; font-weight: 700; color: var(--critical); line-height: 1; }
+  .sp-stat .n.signal { color: var(--warning); }
+  .sp-stat .l { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); max-width: 14ch; }
+
+  /* ---------- Controls ---------- */
+  .controls-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .controls-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .transport { display: flex; align-items: center; gap: 8px; }
+  .btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    background: var(--panel-2);
+    color: var(--text-primary);
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn-ghost {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .btn-ghost:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+  .speedseg { display: inline-flex; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+  .speedseg button {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .speedseg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .speedseg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .sliders-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px 20px;
+  }
+  @media (max-width: 760px) { .sliders-grid { grid-template-columns: repeat(2, 1fr); } }
+  .slider-field { display: flex; flex-direction: column; gap: 6px; }
+  .slider-field label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .slider-field .sv { font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .slider-field input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 3px;
+    background: var(--border-strong);
+    outline: none;
+  }
+  .slider-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--panel);
+    cursor: pointer;
+    margin-top: -6px;
+  }
+  .slider-field input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--panel); cursor: pointer;
+  }
+  .slider-field input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .slider-hint { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; }
+  .invalid-banner {
+    display: none;
+    font-size: 12.5px;
+    color: var(--critical);
+    background: var(--critical-bg);
+    border: 1px solid var(--critical);
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .invalid-banner.show { display: block; }
+
+  /* ---------- Main grid ---------- */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .card-title { font-size: 14.5px; font-weight: 700; margin: 0; }
+  .card-sub { font-size: 11.5px; color: var(--text-muted); margin: 0; }
+
+  .track-wrap { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-strong); }
+  #trackCanvas { display: block; width: 100%; height: 460px; background: var(--shoulder); }
+  .track-flash {
+    position: absolute; inset: 0; pointer-events: none;
+    box-shadow: inset 0 0 0 0 rgba(224,92,92,0);
+    transition: box-shadow .15s ease;
+  }
+  .track-flash.on { box-shadow: inset 0 0 60px 8px rgba(224,92,92,0.55); }
+  .track-flash.signal { box-shadow: inset 0 0 44px 6px rgba(224,167,51,0.45); }
+  .track-toast {
+    position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    color: var(--critical); background: rgba(10,12,16,0.85);
+    border: 1px solid var(--critical); border-radius: 20px;
+    padding: 5px 12px; opacity: 0; transition: opacity .2s ease; pointer-events: none;
+    letter-spacing: 0.03em;
+  }
+  .track-toast.show { opacity: 1; }
+  .track-toast.signal { color: var(--warning); border-color: var(--warning); }
+
+  /* ---------- HUD tiles ---------- */
+  .hud-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .hud-tile {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 13px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .hud-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+  .hud-value { font-family: var(--font-mono); font-size: 23px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .hud-badge {
+    align-self: flex-start;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 20px; margin-top: 2px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .hud-badge.good { background: var(--good-bg); color: var(--good); }
+  .hud-badge.warning { background: var(--warning-bg); color: var(--warning); }
+  .hud-badge.serious { background: var(--serious-bg); color: var(--serious); }
+  .hud-badge.critical { background: var(--critical-bg); color: var(--critical); }
+  .hud-badge::before { content: "●"; font-size: 8px; }
+  .hud-tile.wide { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
+  .hud-tile.wide .hud-cl-values { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .hud-tile.wide .hud-cl-values b { color: var(--text-primary); font-weight: 700; }
+
+  /* ---------- Strip chart ---------- */
+  .chart-axis-label { font-family: var(--font-mono); font-size: 9.5px; }
+  .chart-key { display: flex; gap: 12px 14px; flex-wrap: wrap; font-size: 11px; color: var(--text-secondary); }
+  .chart-key span { display: inline-flex; align-items: center; gap: 5px; }
+  .chart-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .chart-svg-wrap { position: relative; }
+  .chart-svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .viz-tooltip {
+    position: absolute; pointer-events: none;
+    background: var(--panel-3); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 7px 10px; font-size: 11.5px; color: var(--text-secondary);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    opacity: 0; transform: translate(-50%, -100%); white-space: nowrap; z-index: 5;
+    transition: opacity .1s ease;
+  }
+  .viz-tooltip.show { opacity: 1; }
+  .viz-tooltip .tt-title { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .viz-tooltip .tt-val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track-flash, .track-toast, .btn, .hud-value { transition: none !important; }
+  }
+</style>
+
+<div class="sp-root">
+  <div class="sp-shell">
+
+    <header class="sp-header">
+      <div>
+        <p class="sp-eyebrow">SPC Capability Speedway</p>
+        <h1 class="sp-title">Trackside</h1>
+        <p class="sp-subtitle">Machined bore diameter (mm) — steer the process, watch it hold the lane. Road edges are the spec limits; drift past them and the car goes off track.</p>
+      </div>
+      <div class="sp-stats">
+        <div class="sp-stat">
+          <div class="n" id="crashCount">0</div>
+          <div class="l">Off-track (out of spec)</div>
+        </div>
+        <div class="sp-stat">
+          <div class="n signal" id="signalCount">0</div>
+          <div class="l">Signals (out of control)</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="controls-card">
+      <div class="controls-top">
+        <div class="transport">
+          <button class="btn primary" id="playBtn" type="button">Pause</button>
+          <button class="btn" id="resetBtn" type="button">Reset run</button>
+          <div class="speedseg" id="speedSeg" role="group" aria-label="Sample speed">
+            <button type="button" data-speed="2200" aria-pressed="false">Slow</button>
+            <button type="button" data-speed="1100" aria-pressed="true">Medium</button>
+            <button type="button" data-speed="500" aria-pressed="false">Fast</button>
+          </div>
+        </div>
+        <div class="presets" role="group" aria-label="Scenario presets">
+          <button class="btn-ghost" data-preset="capable">Centered &amp; tight</button>
+          <button class="btn-ghost" data-preset="offcenter">Off-center</button>
+          <button class="btn-ghost" data-preset="highvar">High variation</button>
+          <button class="btn-ghost" id="recalcBtn" type="button" title="Re-baseline UCL/LCL from the most recent 20 samples">Recalc control limits</button>
+        </div>
+      </div>
+
+      <div class="invalid-banner" id="invalidBanner">USL must be greater than LSL — capability can't be computed until the spec window is valid.</div>
+
+      <div class="sliders-grid">
+        <div class="slider-field">
+          <label>Process mean (μ) <span class="sv" id="meanVal">50.0</span></label>
+          <input type="range" id="meanSlider" min="10" max="90" step="0.5" value="50">
+          <span class="slider-hint">True generating mean — feeds Cp/Cpk directly as the assumed value, not something estimated from data.</span>
+        </div>
+        <div class="slider-field">
+          <label>Process sigma (σ) <span class="sv" id="sigmaVal">2.5</span></label>
+          <input type="range" id="sigmaSlider" min="0.2" max="9" step="0.1" value="2.5">
+          <span class="slider-hint">True generating sigma — feeds Cp/Cpk directly as the assumed value, not something estimated from data.</span>
+        </div>
+        <div class="slider-field">
+          <label>Upper spec limit (USL) <span class="sv" id="uslVal">65.0</span></label>
+          <input type="range" id="uslSlider" min="40" max="95" step="0.5" value="65">
+        </div>
+        <div class="slider-field">
+          <label>Lower spec limit (LSL) <span class="sv" id="lslVal">35.0</span></label>
+          <input type="range" id="lslSlider" min="5" max="60" step="0.5" value="35">
+        </div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <section class="card" aria-label="Track view">
+        <div class="card-head">
+          <div>
+            <p class="card-title">Live track</p>
+            <p class="card-sub">Curbs mark USL / LSL (spec) · inner lane lines mark UCL / LCL from the I-MR chart</p>
+          </div>
+        </div>
+        <div class="track-wrap">
+          <canvas id="trackCanvas"></canvas>
+          <div class="track-flash" id="trackFlash"></div>
+          <div class="track-toast" id="trackToast">OFF TRACK</div>
+        </div>
+      </section>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <section class="card" aria-label="Capability readout">
+          <div class="card-head">
+            <div>
+              <p class="card-title">Capability readout</p>
+              <p class="card-sub">Target (slider) vs. actual (collected samples) · bands per AIAG SPC manual guidance</p>
+            </div>
+          </div>
+          <div class="hud-grid" id="hudGrid"></div>
+        </section>
+
+        <section class="card" aria-label="Sample history chart">
+          <div class="card-head">
+            <div>
+              <p class="card-title">Sample history</p>
+              <p class="card-sub" id="sampleCount">0 samples collected</p>
+            </div>
+          </div>
+          <div class="chart-key">
+            <span><i style="background:var(--good)"></i>In control</span>
+            <span><i style="background:var(--warning)"></i>Signal (in spec, out of control)</span>
+            <span><i style="background:var(--critical)"></i>Out of spec</span>
+          </div>
+          <div class="chart-svg-wrap" id="chartWrap"></div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const root = document.querySelector('.sp-root');
+  const cs = getComputedStyle(root);
+  const tok = (name) => cs.getPropertyValue(name).trim();
+
+  const els = {
+    mean: document.getElementById('meanSlider'),
+    sigma: document.getElementById('sigmaSlider'),
+    usl: document.getElementById('uslSlider'),
+    lsl: document.getElementById('lslSlider'),
+    meanVal: document.getElementById('meanVal'),
+    sigmaVal: document.getElementById('sigmaVal'),
+    uslVal: document.getElementById('uslVal'),
+    lslVal: document.getElementById('lslVal'),
+    playBtn: document.getElementById('playBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    speedSeg: document.getElementById('speedSeg'),
+    presetsRow: document.querySelector('.presets'),
+    invalidBanner: document.getElementById('invalidBanner'),
+    crashCount: document.getElementById('crashCount'),
+    signalCount: document.getElementById('signalCount'),
+    recalcBtn: document.getElementById('recalcBtn'),
+    hudGrid: document.getElementById('hudGrid'),
+    chartWrap: document.getElementById('chartWrap'),
+    sampleCount: document.getElementById('sampleCount'),
+    trackFlash: document.getElementById('trackFlash'),
+    trackToast: document.getElementById('trackToast'),
+    canvas: document.getElementById('trackCanvas'),
+  };
+
+  // ---------------- State ----------------
+  const BASELINE_N = 20;
+  let running = true;
+  let speedMs = 1100;
+  let sampleTimer = null;
+  let samples = []; // {i, val, pass, inControl}
+  let crashCount = 0;
+  let signalCount = 0;
+  let sampleIndex = 0;
+  let controlLimits = null; // {cl, ucl, lcl, n}
+
+  let carDisplayX = 50;   // logical value-space, smoothed
+  let carTargetX = 50;    // last sampled value
+  let carPrevX = 50;
+
+  function params() {
+    return {
+      mean: +els.mean.value,
+      sigma: +els.sigma.value,
+      usl: +els.usl.value,
+      lsl: +els.lsl.value,
+    };
+  }
+
+  function specValid(p) { return p.usl > p.lsl; }
+
+  // ---------------- RNG ----------------
+  function normalSample(mean, sigma) {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    return mean + z * sigma;
+  }
+
+  // ---------------- Capability math ----------------
+  function computeTarget(p) {
+    if (!specValid(p) || p.sigma <= 0) return null;
+    const cp = (p.usl - p.lsl) / (6 * p.sigma);
+    const cpk = Math.min((p.usl - p.mean) / (3 * p.sigma), (p.mean - p.lsl) / (3 * p.sigma));
+    return { cp, cpk };
+  }
+  function computeActual(p) {
+    if (!specValid(p) || samples.length < 2) return null;
+    const vals = samples.map(s => s.val);
+    const n = vals.length;
+    const mean = vals.reduce((a, b) => a + b, 0) / n;
+    const variance = vals.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (n - 1);
+    const sd = Math.sqrt(variance);
+    if (sd <= 0) return null;
+    const pp = (p.usl - p.lsl) / (6 * sd);
+    const ppk = Math.min((p.usl - mean) / (3 * sd), (mean - p.lsl) / (3 * sd));
+    const yieldPct = samples.filter(s => s.pass).length / n * 100;
+    return { pp, ppk, mean, sd, yieldPct, n };
+  }
+
+  // ---------------- Control limits (I-MR chart, moving-range method) ----------------
+  // Individuals & Moving Range, not X-bar & R: each tick is one single measurement
+  // (one car per lap), not a subgroup, so I-MR is the chart that actually matches
+  // this data. X-bar & R needs rational subgroups (n parts sampled together),
+  // which this simulator doesn't produce.
+  // Voice of the process, not the customer: these come from the data itself, not
+  // from USL/LSL. A run can be perfectly "in control" while still not capable
+  // (too much natural variation), or briefly "out of control" while every part
+  // is still comfortably inside spec.
+  function computeControlLimits(rows) {
+    const vals = rows.map(s => s.val);
+    const n = vals.length;
+    if (n < 2) return null;
+    const xbar = vals.reduce((a, b) => a + b, 0) / n;
+    let mrSum = 0;
+    for (let i = 1; i < n; i++) mrSum += Math.abs(vals[i] - vals[i - 1]);
+    const mrBar = mrSum / (n - 1);
+    const sigmaEst = mrBar / 1.128; // d2 for n=2 moving range
+    return { cl: xbar, ucl: xbar + 3 * sigmaEst, lcl: xbar - 3 * sigmaEst, n };
+  }
+
+  // AIAG SPC manual capability guidance: Cpk/Ppk < 1.00 not capable; 1.00-1.33
+  // marginal (100% inspection or tightened control); 1.33-1.67 capable for an
+  // ongoing/existing process; >= 1.67 capable for a new process or a safety/
+  // critical characteristic (the tier PPAP typically expects).
+  function capabilityBadge(v) {
+    if (v == null || !isFinite(v)) return { cls: 'critical', label: 'N/A' };
+    if (v < 1.0) return { cls: 'critical', label: 'Not capable' };
+    if (v < 1.33) return { cls: 'serious', label: 'Marginal' };
+    if (v < 1.67) return { cls: 'good', label: 'Capable' };
+    return { cls: 'good', label: 'Capable (critical)' };
+  }
+
+  const fmt2 = (n) => (n == null || !isFinite(n)) ? '—' : n.toFixed(2);
+  const fmt1 = (n) => (n == null || !isFinite(n)) ? '—' : n.toFixed(1);
+
+  // ---------------- HUD ----------------
+  function renderHud() {
+    const p = params();
+    const t = computeTarget(p);
+    const a = computeActual(p);
+
+    const cpBadge = t ? capabilityBadge(t.cp) : { cls: 'critical', label: 'N/A' };
+    const cpkBadge = t ? capabilityBadge(t.cpk) : { cls: 'critical', label: 'N/A' };
+    const ppBadge = a ? capabilityBadge(a.pp) : { cls: 'critical', label: '—' };
+    const ppkBadge = a ? capabilityBadge(a.ppk) : { cls: 'critical', label: '—' };
+    // Yield has no AIAG threshold of its own — it's the same sample as Ppk, so
+    // it inherits Ppk's capability tier rather than a separately invented cutoff.
+    const yBadge = ppkBadge;
+
+    els.hudGrid.innerHTML = `
+      <div class="hud-tile">
+        <span class="hud-label">Cp (target)</span>
+        <span class="hud-value">${t ? fmt2(t.cp) : '—'}</span>
+        <span class="hud-badge ${cpBadge.cls}">${cpBadge.label}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Cpk (target)</span>
+        <span class="hud-value">${t ? fmt2(t.cpk) : '—'}</span>
+        <span class="hud-badge ${cpkBadge.cls}">${cpkBadge.label}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Pp (actual)</span>
+        <span class="hud-value">${a ? fmt2(a.pp) : '—'}</span>
+        <span class="hud-badge ${ppBadge.cls}">${a ? ppBadge.label : 'Collecting…'}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Ppk (actual)</span>
+        <span class="hud-value">${a ? fmt2(a.ppk) : '—'}</span>
+        <span class="hud-badge ${ppkBadge.cls}">${a ? ppkBadge.label : 'Collecting…'}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Yield (actual)</span>
+        <span class="hud-value">${a ? fmt1(a.yieldPct) + '%' : '—'}</span>
+        <span class="hud-badge ${yBadge.cls}">${a ? yBadge.label : 'Collecting…'}</span>
+        <span style="font-size:10px;color:var(--text-muted);">AIAG sets no yield cutoff — shown at Ppk's tier</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Sample mean / σ</span>
+        <span class="hud-value" style="font-size:17px;">${a ? fmt2(a.mean) + ' / ' + fmt2(a.sd) : '—'}</span>
+        <span class="hud-badge good" style="visibility:${a ? 'visible' : 'hidden'}">n = ${a ? a.n : 0}</span>
+      </div>
+      <div class="hud-tile wide">
+        <div>
+          <span class="hud-label">Process control (I-MR chart)</span>
+          <div>${controlLimitsBadge()}</div>
+        </div>
+        <div class="hud-cl-values">${controlLimits ? `UCL <b>${fmt2(controlLimits.ucl)}</b> · CL <b>${fmt2(controlLimits.cl)}</b> · LCL <b>${fmt2(controlLimits.lcl)}</b>` : `Baseline: ${Math.min(samples.length, BASELINE_N)}/${BASELINE_N} samples`}</div>
+      </div>
+    `;
+    els.invalidBanner.classList.toggle('show', !specValid(p));
+    els.sampleCount.textContent = samples.length + ' sample' + (samples.length === 1 ? '' : 's') + ' collected'
+      + (controlLimits ? '' : ` · establishing control limits (${Math.min(samples.length, BASELINE_N)}/${BASELINE_N})`);
+  }
+
+  function controlLimitsBadge() {
+    if (!controlLimits) return `<span class="hud-badge warning">Establishing baseline</span>`;
+    const last = samples[samples.length - 1];
+    if (last && last.inControl === false) return `<span class="hud-badge warning">Out of control</span>`;
+    return `<span class="hud-badge good">In control</span>`;
+  }
+
+  // ---------------- Track canvas ----------------
+  let dims = { w: 0, h: 0, dpr: 1 };
+  const ctx = els.canvas.getContext('2d');
+
+  function setupCanvas() {
+    const rect = els.canvas.getBoundingClientRect();
+    dims.dpr = window.devicePixelRatio || 1;
+    dims.w = rect.width;
+    dims.h = rect.height;
+    els.canvas.width = Math.round(dims.w * dims.dpr);
+    els.canvas.height = Math.round(dims.h * dims.dpr);
+    ctx.setTransform(dims.dpr, 0, 0, dims.dpr, 0, 0);
+  }
+
+  function viewRange(p) {
+    if (!specValid(p)) {
+      const m = p.mean, s = Math.max(p.sigma, 0.5);
+      return { min: m - 4 * s, max: m + 4 * s };
+    }
+    const span = p.usl - p.lsl;
+    const margin = span * 0.4;
+    return { min: p.lsl - margin, max: p.usl + margin };
+  }
+  function valueToX(val, p) {
+    const vr = viewRange(p);
+    const t = (val - vr.min) / (vr.max - vr.min);
+    const roadLeft = dims.w * 0.08, roadWidth = dims.w * 0.84;
+    return roadLeft + Math.min(Math.max(t, -0.2), 1.2) * roadWidth;
+  }
+
+  let scrollOffset = 0;
+  let wobbleT = 0;
+  let lastFrame = null;
+
+  function drawCar(x, y, angle, colorMain, colorGlass) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    const w = 22, h = 40;
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(0, h * 0.42, w * 0.62, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // wheels
+    ctx.fillStyle = '#0c0e12';
+    [[-w * 0.55, -h * 0.22], [w * 0.55, -h * 0.22], [-w * 0.55, h * 0.22], [w * 0.55, h * 0.22]].forEach(([wx, wy]) => {
+      ctx.beginPath();
+      ctx.roundRect(wx - 3.5, wy - 7, 7, 14, 3);
+      ctx.fill();
+    });
+    // body
+    const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    grad.addColorStop(0, colorMain);
+    grad.addColorStop(1, shade(colorMain, -22));
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(-w / 2, -h / 2, w, h, 9);
+    ctx.fill();
+    // windshield
+    ctx.fillStyle = colorGlass;
+    ctx.beginPath();
+    ctx.roundRect(-w * 0.32, -h * 0.28, w * 0.64, h * 0.3, 4);
+    ctx.fill();
+    // headlights
+    ctx.fillStyle = '#F3F1E8';
+    ctx.beginPath(); ctx.ellipse(-w * 0.3, -h * 0.46, 2.6, 3.2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(w * 0.3, -h * 0.46, 2.6, 3.2, 0, 0, Math.PI * 2); ctx.fill();
+    // taillights
+    ctx.fillStyle = tok('--critical');
+    ctx.beginPath(); ctx.ellipse(-w * 0.3, h * 0.46, 2, 2.4, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(w * 0.3, h * 0.46, 2, 2.4, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  function shade(hex, pct) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) + pct, g = (n >> 8 & 0xff) + pct, b = (n & 0xff) + pct;
+    r = Math.min(255, Math.max(0, r)); g = Math.min(255, Math.max(0, g)); b = Math.min(255, Math.max(0, b));
+    return '#' + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+  }
+
+  function draw(ts) {
+    if (!lastFrame) lastFrame = ts;
+    const dt = Math.min(48, ts - lastFrame);
+    lastFrame = ts;
+
+    const p = params();
+    const carY = dims.h * 0.72;
+
+    if (running) {
+      scrollOffset = (scrollOffset + dt * 0.11) % 40;
+      wobbleT += dt;
+    }
+
+    // smooth toward sampled target
+    carDisplayX += (carTargetX - carDisplayX) * Math.min(1, dt / 220);
+
+    const specWidth = specValid(p) ? Math.max(p.usl - p.lsl, 1) : 40;
+    const wobbleAmp = running ? Math.min(10, (p.sigma / specWidth) * 90) : 0;
+    const wobbleVal = Math.sin(wobbleT / 130) * wobbleAmp * 0.5 + Math.sin(wobbleT / 47) * wobbleAmp * 0.22;
+
+    const xBase = valueToX(carDisplayX, p);
+    const xRender = xBase + wobbleVal;
+    const steer = Math.max(-0.34, Math.min(0.34, (xRender - carPrevX) * 0.05));
+    carPrevX = carPrevX + (xRender - carPrevX) * 0.4;
+
+    // ---- background ----
+    ctx.clearRect(0, 0, dims.w, dims.h);
+    ctx.fillStyle = tok('--shoulder-2');
+    ctx.fillRect(0, 0, dims.w, dims.h);
+
+    const roadLeft = dims.w * 0.08, roadWidth = dims.w * 0.84;
+    // shoulder texture (dashes)
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 10;
+    for (let i = -1; i < dims.h / 26 + 1; i++) {
+      const yy = i * 26 + (scrollOffset % 26);
+      ctx.beginPath(); ctx.moveTo(roadLeft * 0.3, yy); ctx.lineTo(roadLeft * 0.3 + 40, yy - 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(dims.w - roadLeft * 0.3, yy); ctx.lineTo(dims.w - roadLeft * 0.3 - 40, yy - 40); ctx.stroke();
+    }
+
+    // road
+    ctx.fillStyle = tok('--road');
+    ctx.fillRect(roadLeft, 0, roadWidth, dims.h);
+
+    // curbs at spec limits
+    if (specValid(p)) {
+      const xL = valueToX(p.lsl, p), xU = valueToX(p.usl, p);
+      [xL, xU].forEach((xc) => {
+        const stripeW = 9;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(xc - stripeW / 2, 0, stripeW, dims.h);
+        ctx.clip();
+        const step = 16;
+        for (let i = -2; i < dims.h / step + 2; i++) {
+          const yy = i * step + (scrollOffset % step);
+          ctx.fillStyle = (i % 2 === 0) ? tok('--curb-a') : tok('--curb-b');
+          ctx.beginPath();
+          ctx.moveTo(xc - stripeW, yy);
+          ctx.lineTo(xc, yy - step);
+          ctx.lineTo(xc + stripeW, yy - step);
+          ctx.lineTo(xc, yy);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+
+      // nominal center dashed line
+      const xNom = valueToX((p.usl + p.lsl) / 2, p);
+      drawDashed(xNom, tok('--paint'), 0.55);
+
+      // process aim line (if noticeably different)
+      const xAim = valueToX(p.mean, p);
+      if (Math.abs(xAim - xNom) > 3) drawDashed(xAim, tok('--accent'), 0.85);
+    }
+
+    // control limits — voice of the process, independent of the spec window
+    if (controlLimits) {
+      drawDashed(valueToX(controlLimits.ucl, p), tok('--warning'), 0.7, 1.3, [6, 6]);
+      drawDashed(valueToX(controlLimits.lcl, p), tok('--warning'), 0.7, 1.3, [6, 6]);
+    }
+
+    function drawDashed(xc, color, alpha, width, dash) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width || 2;
+      ctx.setLineDash(dash || [12, 10]);
+      ctx.lineDashOffset = -scrollOffset;
+      ctx.beginPath();
+      ctx.moveTo(xc, 0); ctx.lineTo(xc, dims.h);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // recent trail
+    const trail = samples.slice(-24);
+    if (trail.length > 1) {
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      for (let i = 1; i < trail.length; i++) {
+        const a = trail[i - 1], b = trail[i];
+        const y0 = carY - (trail.length - i) * 13;
+        const y1 = carY - (trail.length - (i + 1)) * 13;
+        ctx.globalAlpha = 0.16 + 0.5 * (i / trail.length);
+        ctx.strokeStyle = b.pass ? tok('--good') : tok('--critical');
+        ctx.beginPath();
+        ctx.moveTo(valueToX(a.val, p), y0);
+        ctx.lineTo(valueToX(b.val, p), y1);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // car
+    const onGrass = specValid(p) && (carDisplayX < p.lsl || carDisplayX > p.usl);
+    drawCar(xRender, carY, steer, onGrass ? tok('--critical') : tok('--accent'), tok('--panel-3'));
+
+    requestAnimationFrame(draw);
+  }
+
+  // ---------------- Strip chart (SVG) ----------------
+  function makeTooltip(wrap) {
+    let el = wrap.querySelector('.viz-tooltip');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'viz-tooltip';
+      wrap.appendChild(el);
+    }
+    return {
+      show(x, y, title, value, color) {
+        el.innerHTML = `<div class="tt-title">${title}</div><div class="tt-val" style="color:${color}">${value}</div>`;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.classList.add('show');
+      },
+      hide() { el.classList.remove('show'); }
+    };
+  }
+
+  function pointColor(d) {
+    if (!d.pass) return tok('--critical');
+    if (d.inControl === false) return tok('--warning');
+    return tok('--good');
+  }
+  function pointStatusLabel(d) {
+    if (!d.pass) return 'out of spec';
+    if (d.inControl === false) return 'in spec, out of control';
+    return 'in spec';
+  }
+
+  function renderChart() {
+    const p = params();
+    const wrap = els.chartWrap;
+    let svg = wrap.querySelector('svg');
+    const W = 460, H = 200, padL = 44, padR = 10, padT = 10, padB = 22;
+    const vr = viewRange(p);
+    const data = samples.slice(-40);
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    if (!svg) {
+      svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('class', 'chart-svg');
+      svg.setAttribute('role', 'img');
+      wrap.insertBefore(svg, wrap.firstChild);
+    }
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('aria-label', 'Sample history: ' + data.length + ' points');
+
+    const x = (i) => padL + (data.length <= 1 ? 0 : (i / (Math.max(data.length - 1, 1))) * (W - padL - padR));
+    const y = (v) => padT + (1 - (v - vr.min) / (vr.max - vr.min)) * (H - padT - padB);
+
+    let html = '';
+    const gridLine = tok('--border-strong');
+    const muted = tok('--text-muted');
+
+    if (specValid(p)) {
+      const yU = y(p.usl), yL = y(p.lsl), yN = y((p.usl + p.lsl) / 2);
+      html += `<line x1="${padL}" y1="${yU.toFixed(1)}" x2="${W-padR}" y2="${yU.toFixed(1)}" stroke="${tok('--curb-a')}" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.8"/>`;
+      html += `<text x="${padL}" y="${(yU - 4).toFixed(1)}" class="chart-axis-label" fill="${tok('--curb-a')}">USL ${p.usl.toFixed(1)}</text>`;
+      html += `<line x1="${padL}" y1="${yL.toFixed(1)}" x2="${W-padR}" y2="${yL.toFixed(1)}" stroke="${tok('--curb-a')}" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.8"/>`;
+      html += `<text x="${padL}" y="${(yL + 12).toFixed(1)}" class="chart-axis-label" fill="${tok('--curb-a')}">LSL ${p.lsl.toFixed(1)}</text>`;
+      html += `<line x1="${padL}" y1="${yN.toFixed(1)}" x2="${W-padR}" y2="${yN.toFixed(1)}" stroke="${muted}" stroke-width="1" stroke-dasharray="2 4" opacity="0.6"/>`;
+    }
+
+    if (controlLimits) {
+      const yUcl = y(controlLimits.ucl), yLcl = y(controlLimits.lcl), yCl = y(controlLimits.cl);
+      html += `<line x1="${padL}" y1="${yUcl.toFixed(1)}" x2="${W-padR}" y2="${yUcl.toFixed(1)}" stroke="${tok('--warning')}" stroke-width="1.3" stroke-dasharray="4 4" opacity="0.85"/>`;
+      html += `<text x="${W-padR}" y="${(yUcl - 4).toFixed(1)}" text-anchor="end" class="chart-axis-label" fill="${tok('--warning')}">UCL ${controlLimits.ucl.toFixed(1)}</text>`;
+      html += `<line x1="${padL}" y1="${yLcl.toFixed(1)}" x2="${W-padR}" y2="${yLcl.toFixed(1)}" stroke="${tok('--warning')}" stroke-width="1.3" stroke-dasharray="4 4" opacity="0.85"/>`;
+      html += `<text x="${W-padR}" y="${(yLcl + 12).toFixed(1)}" text-anchor="end" class="chart-axis-label" fill="${tok('--warning')}">LCL ${controlLimits.lcl.toFixed(1)}</text>`;
+      html += `<line x1="${padL}" y1="${yCl.toFixed(1)}" x2="${W-padR}" y2="${yCl.toFixed(1)}" stroke="${tok('--warning')}" stroke-width="1" stroke-dasharray="1 5" opacity="0.5"/>`;
+    }
+
+    if (data.length > 1) {
+      let linePath = '';
+      data.forEach((d, i) => { linePath += (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(d.val).toFixed(1) + ' '; });
+      html += `<path d="${linePath}" fill="none" stroke="${tok('--accent')}" stroke-width="1.6" opacity="0.55" stroke-linejoin="round"/>`;
+    }
+
+    data.forEach((d, i) => {
+      const cx = x(i), cy = y(d.val);
+      const color = pointColor(d);
+      html += `<circle class="pt" data-i="${i}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.2" fill="${color}" stroke="${tok('--panel')}" stroke-width="1"/>`;
+      html += `<circle class="pt-hit" data-i="${i}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="10" fill="transparent" tabindex="0"/>`;
+    });
+
+    svg.innerHTML = html;
+
+    const tooltip = makeTooltip(wrap);
+    svg.querySelectorAll('.pt-hit').forEach((hit) => {
+      const i = +hit.getAttribute('data-i');
+      const d = data[i];
+      function activate() {
+        const rect = wrap.getBoundingClientRect();
+        const px = (+hit.getAttribute('cx') / W) * rect.width;
+        const py = (+hit.getAttribute('cy') / H) * rect.height;
+        tooltip.show(px, py - 8, 'Sample #' + d.i, d.val.toFixed(2) + ' mm · ' + pointStatusLabel(d), pointColor(d));
+      }
+      hit.addEventListener('pointerenter', activate);
+      hit.addEventListener('pointermove', activate);
+      hit.addEventListener('pointerleave', () => tooltip.hide());
+      hit.addEventListener('focus', activate);
+      hit.addEventListener('blur', () => tooltip.hide());
+    });
+  }
+
+  // ---------------- Sampling ----------------
+  function tick() {
+    const p = params();
+    const val = normalSample(p.mean, p.sigma);
+    const pass = specValid(p) ? (val >= p.lsl && val <= p.usl) : true;
+    const inControl = controlLimits ? (val >= controlLimits.lcl && val <= controlLimits.ucl) : null;
+    sampleIndex++;
+    samples.push({ i: sampleIndex, val, pass, inControl });
+    if (samples.length > 300) samples.shift();
+
+    // establish the control-limit baseline once we have enough points
+    if (!controlLimits && samples.length >= BASELINE_N) {
+      controlLimits = computeControlLimits(samples.slice(0, BASELINE_N));
+    }
+
+    carPrevX = carDisplayX;
+    carTargetX = val;
+
+    if (!pass) {
+      crashCount++;
+      els.crashCount.textContent = crashCount;
+      els.trackFlash.classList.remove('signal');
+      els.trackFlash.classList.add('on');
+      els.trackToast.classList.remove('signal');
+      els.trackToast.textContent = 'OFF TRACK — ' + val.toFixed(1) + ' mm';
+      els.trackToast.classList.add('show');
+      setTimeout(() => els.trackFlash.classList.remove('on'), 260);
+      setTimeout(() => els.trackToast.classList.remove('show'), 900);
+    } else if (inControl === false) {
+      signalCount++;
+      els.signalCount.textContent = signalCount;
+      els.trackFlash.classList.remove('on');
+      els.trackFlash.classList.add('signal');
+      els.trackToast.classList.add('signal');
+      els.trackToast.textContent = 'OUT OF CONTROL — ' + val.toFixed(1) + ' mm';
+      els.trackToast.classList.add('show');
+      setTimeout(() => els.trackFlash.classList.remove('signal'), 260);
+      setTimeout(() => { els.trackToast.classList.remove('show'); els.trackToast.classList.remove('signal'); }, 900);
+    }
+
+    renderHud();
+    renderChart();
+  }
+
+  function startTimer() {
+    stopTimer();
+    if (running) sampleTimer = setInterval(tick, speedMs);
+  }
+  function stopTimer() { if (sampleTimer) clearInterval(sampleTimer); sampleTimer = null; }
+
+  // ---------------- Wiring ----------------
+  function syncSliderLabels() {
+    els.meanVal.textContent = (+els.mean.value).toFixed(1);
+    els.sigmaVal.textContent = (+els.sigma.value).toFixed(1);
+    els.uslVal.textContent = (+els.usl.value).toFixed(1);
+    els.lslVal.textContent = (+els.lsl.value).toFixed(1);
+    renderHud();
+    renderChart();
+  }
+  [els.mean, els.sigma, els.usl, els.lsl].forEach(inp => inp.addEventListener('input', syncSliderLabels));
+
+  els.playBtn.addEventListener('click', () => {
+    running = !running;
+    els.playBtn.textContent = running ? 'Pause' : 'Play';
+    els.playBtn.classList.toggle('primary', running);
+    startTimer();
+  });
+
+  els.resetBtn.addEventListener('click', () => {
+    samples = [];
+    sampleIndex = 0;
+    crashCount = 0;
+    signalCount = 0;
+    controlLimits = null;
+    els.crashCount.textContent = '0';
+    els.signalCount.textContent = '0';
+    carDisplayX = carTargetX = carPrevX = +els.mean.value;
+    renderHud();
+    renderChart();
+  });
+
+  els.recalcBtn.addEventListener('click', () => {
+    const baseline = samples.slice(-BASELINE_N);
+    if (baseline.length < 2) return;
+    controlLimits = computeControlLimits(baseline);
+    signalCount = 0;
+    els.signalCount.textContent = '0';
+    renderHud();
+    renderChart();
+  });
+
+  els.speedSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    els.speedSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+    speedMs = +btn.getAttribute('data-speed');
+    startTimer();
+  });
+
+  const presets = {
+    capable:   { mean: 50, sigma: 2.5, usl: 65, lsl: 35 },
+    offcenter: { mean: 58, sigma: 2.5, usl: 65, lsl: 35 },
+    highvar:   { mean: 50, sigma: 6,   usl: 65, lsl: 35 },
+  };
+  els.presetsRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-preset]'); if (!btn) return;
+    const cfg = presets[btn.getAttribute('data-preset')];
+    els.mean.value = cfg.mean; els.sigma.value = cfg.sigma; els.usl.value = cfg.usl; els.lsl.value = cfg.lsl;
+    syncSliderLabels();
+  });
+
+  window.addEventListener('resize', setupCanvas);
+
+  // ---------------- Init ----------------
+  syncSliderLabels();
+  setupCanvas();
+  renderHud();
+  renderChart();
+  startTimer();
+  requestAnimationFrame(draw);
+})();
+</script>

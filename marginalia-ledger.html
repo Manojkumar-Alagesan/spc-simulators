@@ -1,0 +1,1034 @@
+<title>Marginalia Books — Weekly Ledger</title>
+<style>
+  .ml-root {
+    --surface-1:      #EDEFE9;
+    --surface-2:      #F5F6F1;
+    --plane:          #E2E4DB;
+    --text-primary:   #1C2321;
+    --text-secondary: #52584E;
+    --text-muted:     #8B8F80;
+    --grid-line:      #D9DBCE;
+    --baseline:       #C0C3B4;
+    --border:         rgba(28,35,33,0.12);
+    --border-strong:  rgba(28,35,33,0.22);
+
+    --accent:         #9A3324;
+    --accent-ink:     #ffffff;
+
+    --series-red:     #9A3324;
+    --series-teal:    #009999;
+    --series-yellow:  #C1861A;
+    --series-blue:    #2C4F8C;
+    --series-green:   #2F7D32;
+    --series-violet:  #7B3F98;
+
+    --seq-100: #E3F5F5;
+    --seq-200: #B8E4E4;
+    --seq-300: #7DCACA;
+    --seq-400: #3DA8A8;
+    --seq-500: #009999;
+    --seq-600: #00726F;
+
+    --good:     #0ca30c;
+    --warning:  #a66600;
+    --serious:  #b4501f;
+    --critical: #b02a2a;
+    --good-bg:     rgba(12,163,12,0.12);
+    --warning-bg:  rgba(250,178,25,0.20);
+    --serious-bg:  rgba(236,131,90,0.20);
+    --critical-bg: rgba(208,59,59,0.14);
+
+    --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .ml-root {
+      --surface-1:      #12181A;
+      --surface-2:      #182022;
+      --plane:          #0B0F10;
+      --text-primary:   #F3F1E8;
+      --text-secondary: #C7CABD;
+      --text-muted:     #8B9088;
+      --grid-line:      #232B2C;
+      --baseline:       #35403F;
+      --border:         rgba(243,241,232,0.10);
+      --border-strong:  rgba(243,241,232,0.18);
+
+      --accent:         #C24A38;
+
+      --series-red:     #C24A38;
+      --series-teal:    #0090A0;
+      --series-yellow:  #C9821A;
+      --series-blue:    #4D74B8;
+      --series-green:   #4CA150;
+      --series-violet:  #A566C4;
+
+      --seq-100: #0F2426;
+      --seq-200: #113538;
+      --seq-300: #135356;
+      --seq-400: #0E7175;
+      --seq-500: #0090A0;
+      --seq-600: #3BC2CE;
+
+      --good:     #4fd44f;
+      --warning:  #e0a733;
+      --serious:  #ec835a;
+      --critical: #e05c5c;
+      --good-bg:     rgba(79,212,79,0.14);
+      --warning-bg:  rgba(224,167,51,0.16);
+      --serious-bg:  rgba(236,131,90,0.16);
+      --critical-bg: rgba(224,92,92,0.16);
+
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] .ml-root {
+    --surface-1:      #12181A;
+    --surface-2:      #182022;
+    --plane:          #0B0F10;
+    --text-primary:   #F3F1E8;
+    --text-secondary: #C7CABD;
+    --text-muted:     #8B9088;
+    --grid-line:      #232B2C;
+    --baseline:       #35403F;
+    --border:         rgba(243,241,232,0.10);
+    --border-strong:  rgba(243,241,232,0.18);
+    --accent:         #C24A38;
+    --series-red:     #C24A38;
+    --series-teal:    #0090A0;
+    --series-yellow:  #C9821A;
+    --series-blue:    #4D74B8;
+    --series-green:   #4CA150;
+    --series-violet:  #A566C4;
+    --seq-100: #0F2426; --seq-200: #113538; --seq-300: #135356;
+    --seq-400: #0E7175; --seq-500: #0090A0; --seq-600: #3BC2CE;
+    --good: #4fd44f; --warning: #e0a733; --serious: #ec835a; --critical: #e05c5c;
+    --good-bg: rgba(79,212,79,0.14); --warning-bg: rgba(224,167,51,0.16);
+    --serious-bg: rgba(236,131,90,0.16); --critical-bg: rgba(224,92,92,0.16);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] .ml-root {
+    --surface-1:      #EDEFE9;
+    --surface-2:      #F5F6F1;
+    --plane:          #E2E4DB;
+    --text-primary:   #1C2321;
+    --text-secondary: #52584E;
+    --text-muted:     #8B8F80;
+    --grid-line:      #D9DBCE;
+    --baseline:       #C0C3B4;
+    --border:         rgba(28,35,33,0.12);
+    --border-strong:  rgba(28,35,33,0.22);
+    --accent:         #9A3324;
+    --series-red:     #9A3324;
+    --series-teal:    #009999;
+    --series-yellow:  #C1861A;
+    --series-blue:    #2C4F8C;
+    --series-green:   #2F7D32;
+    --series-violet:  #7B3F98;
+    --seq-100: #E3F5F5; --seq-200: #B8E4E4; --seq-300: #7DCACA;
+    --seq-400: #3DA8A8; --seq-500: #009999; --seq-600: #00726F;
+    --good: #0ca30c; --warning: #a66600; --serious: #b4501f; --critical: #b02a2a;
+    --good-bg: rgba(12,163,12,0.12); --warning-bg: rgba(250,178,25,0.20);
+    --serious-bg: rgba(236,131,90,0.20); --critical-bg: rgba(208,59,59,0.14);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  .ml-root {
+    background: var(--plane);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: clamp(20px, 4vw, 48px);
+    min-height: 100%;
+  }
+
+  .ml-shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+  /* ---------- Header ---------- */
+  .ml-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .ml-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 6px;
+  }
+  .ml-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: 0.01em;
+  }
+  .ml-title em { font-style: italic; color: var(--accent); }
+  .ml-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 6px 0 0;
+  }
+  .ml-updated {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: right;
+  }
+  .ml-updated .dot {
+    display: inline-block;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--good);
+    margin-right: 6px;
+  }
+
+  /* ---------- Filter row ---------- */
+  .ml-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ml-filters .flabel {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+  .segctrl {
+    display: inline-flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .segctrl button {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 13px;
+    cursor: pointer;
+  }
+  .segctrl button:hover { background: var(--border); }
+  .segctrl button[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .segctrl button:focus-visible,
+  .card button:focus-visible,
+  .bar-hit:focus-visible,
+  .cell-hit:focus-visible {
+    outline: 2px solid var(--series-blue);
+    outline-offset: 2px;
+  }
+
+  /* ---------- KPI tiles ---------- */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+  }
+  .kpi-tile {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .kpi-label {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  .kpi-value-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .kpi-delta {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .kpi-delta.up { color: var(--good); }
+  .kpi-delta.down { color: var(--critical); }
+  .kpi-spark { width: 100%; height: 32px; display: block; }
+
+  /* ---------- Main grid ---------- */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 14px;
+    align-items: stretch;
+  }
+  @media (max-width: 860px) {
+    .main-grid, .lower-grid { grid-template-columns: 1fr; }
+  }
+  .lower-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 16.5px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .card-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+  }
+  .card-toggle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 9px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .card-toggle:hover { border-color: var(--border-strong); }
+
+  /* ---------- legend ---------- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .legend-swatch {
+    width: 10px; height: 10px; border-radius: 2.5px; flex: none;
+  }
+
+  /* ---------- chart / svg ---------- */
+  .chart-wrap { position: relative; }
+  .chart-svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .crosshair-line { stroke: var(--baseline); stroke-width: 1; pointer-events: none; opacity: 0; }
+  .area-fill { fill: var(--series-teal); opacity: 0.10; }
+  .trend-line { fill: none; stroke: var(--series-teal); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .trend-dot { fill: var(--series-teal); stroke: var(--surface-1); stroke-width: 2; opacity: 0; }
+  .axis-label { font-family: var(--font-mono); font-size: 10.5px; fill: var(--text-muted); }
+  .end-label-val { font-family: var(--font-body); font-size: 13px; font-weight: 700; fill: var(--text-primary); }
+  .end-label-sub { font-family: var(--font-mono); font-size: 10px; fill: var(--text-muted); }
+  .hit-col { fill: transparent; }
+
+  .bar-hit { cursor: pointer; }
+  .bar-hit rect.bar { transition: opacity .12s ease; }
+  .bar-hit:hover rect.bar, .bar-hit:focus-visible rect.bar { opacity: 0.82; }
+  .bar-value { font-family: var(--font-body); font-size: 12px; font-weight: 700; fill: var(--text-primary); }
+  .bar-cat { font-family: var(--font-body); font-size: 12px; fill: var(--text-secondary); }
+
+  .cell-hit rect.cell { transition: opacity .12s ease; }
+  .cell-hit:hover rect.cell, .cell-hit:focus-visible rect.cell { opacity: 0.85; }
+
+  /* ---------- tooltip ---------- */
+  .viz-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 8px 11px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.16);
+    opacity: 0;
+    transform: translate(-50%, -100%);
+    white-space: nowrap;
+    z-index: 5;
+    transition: opacity .1s ease;
+  }
+  .viz-tooltip.show { opacity: 1; }
+  .viz-tooltip .tt-title { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .viz-tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+  .viz-tooltip .tt-key { width: 10px; height: 2px; border-radius: 1px; flex: none; }
+  .viz-tooltip .tt-val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+  /* ---------- table view (for accessibility toggle) ---------- */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th, .data-table td {
+    text-align: left;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--grid-line);
+  }
+  .data-table th {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .data-table td.num, .data-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .row-swatch { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 7px; }
+
+  /* ---------- sellers table ---------- */
+  .sellers-table { width: 100%; border-collapse: collapse; }
+  .sellers-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding: 0 10px 8px;
+    border-bottom: 1px solid var(--grid-line);
+  }
+  .sellers-table th.num, .sellers-table td.num { text-align: right; }
+  .sellers-table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--grid-line);
+    font-size: 13.5px;
+    vertical-align: middle;
+  }
+  .sellers-table tr:last-child td { border-bottom: none; }
+  .sellers-table td.num { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .book-title { font-weight: 600; }
+  .book-author { color: var(--text-muted); font-size: 12px; margin-top: 1px; }
+  .genre-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 9px 3px 7px;
+  }
+  .genre-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+
+  /* ---------- shelf alerts ---------- */
+  .alert-list { display: flex; flex-direction: column; gap: 8px; }
+  .alert-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+  .alert-icon {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .alert-icon.warning { background: var(--warning-bg); color: var(--warning); }
+  .alert-icon.critical { background: var(--critical-bg); color: var(--critical); }
+  .alert-body { flex: 1; min-width: 0; }
+  .alert-title { font-size: 13px; font-weight: 600; margin: 0; }
+  .alert-meta { font-size: 11.5px; color: var(--text-muted); margin: 1px 0 0; }
+  .alert-status {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex: none;
+  }
+  .alert-status.warning { background: var(--warning-bg); color: var(--warning); }
+  .alert-status.critical { background: var(--critical-bg); color: var(--critical); }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-toggle, .bar-hit rect.bar, .cell-hit rect.cell, .viz-tooltip { transition: none !important; }
+  }
+</style>
+
+<div class="ml-root">
+  <div class="ml-shell">
+
+    <header class="ml-header">
+      <div>
+        <p class="ml-eyebrow">Weekly Ledger</p>
+        <h1 class="ml-title">Marginalia <em>Books</em></h1>
+        <p class="ml-subtitle">427 Alder Street · trade &amp; used books, new &amp; secondhand</p>
+      </div>
+      <div class="ml-updated">
+        <span class="dot" aria-hidden="true"></span>Week ending Jul 12, 2026<br>posted Jul 14, 2026
+      </div>
+    </header>
+
+    <div class="ml-filters" role="group" aria-label="Trend chart range">
+      <span class="flabel">Trend range</span>
+      <div class="segctrl" id="rangeSeg">
+        <button type="button" data-range="4" aria-pressed="false">Last 4 weeks</button>
+        <button type="button" data-range="8" aria-pressed="true">Last 8 weeks</button>
+      </div>
+    </div>
+
+    <!-- KPI tiles -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- Revenue trend + genre bars -->
+    <div class="main-grid">
+      <section class="card" aria-label="Revenue trend">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Revenue trend</h2>
+            <p class="card-sub">Weekly gross, register + online orders</p>
+          </div>
+          <button class="card-toggle" id="trendToggle" type="button" aria-pressed="false">View as table</button>
+        </div>
+        <div class="chart-wrap" id="trendChartWrap"></div>
+        <table class="data-table sr-only-toggle" id="trendTable" style="display:none;">
+          <thead><tr><th>Week ending</th><th class="num">Revenue</th></tr></thead>
+          <tbody id="trendTableBody"></tbody>
+        </table>
+      </section>
+
+      <section class="card" aria-label="Sales by genre">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Sales by genre</h2>
+            <p class="card-sub">Share of this week's $8,412</p>
+          </div>
+          <button class="card-toggle" id="genreToggle" type="button" aria-pressed="false">View as table</button>
+        </div>
+        <div class="legend" id="genreLegend"></div>
+        <div class="chart-wrap" id="genreChartWrap"></div>
+        <table class="data-table" id="genreTable" style="display:none;">
+          <thead><tr><th>Genre</th><th class="num">Units</th><th class="num">Revenue</th></tr></thead>
+          <tbody id="genreTableBody"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <!-- Day-of-week + shelf alerts -->
+    <div class="lower-grid">
+      <section class="card" aria-label="Revenue by day of week">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Revenue by day</h2>
+            <p class="card-sub">This week, Mon–Sun</p>
+          </div>
+        </div>
+        <div class="chart-wrap" id="dowChartWrap"></div>
+      </section>
+
+      <section class="card" aria-label="Shelf alerts">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Shelf alerts</h2>
+            <p class="card-sub">Reorder before next delivery, Thu</p>
+          </div>
+        </div>
+        <div class="alert-list" id="alertList"></div>
+      </section>
+    </div>
+
+    <!-- Top sellers -->
+    <section class="card" aria-label="Top sellers this week">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Top sellers</h2>
+          <p class="card-sub">By units, week ending Jul 12</p>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="sellers-table" id="sellersTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Genre</th>
+              <th class="num">Units</th>
+              <th class="num">Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="sellersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const root = document.querySelector('.ml-root');
+  const cs = getComputedStyle(root);
+  const tok = (name) => cs.getPropertyValue(name).trim();
+
+  // ---------------- Data ----------------
+  const weeks = [
+    { label: "May 24", revenue: 7120, orders: 301, members: 22 },
+    { label: "May 31", revenue: 7480, orders: 318, members: 28 },
+    { label: "Jun 7",  revenue: 6890, orders: 289, members: 19 },
+    { label: "Jun 14", revenue: 7960, orders: 340, members: 35 },
+    { label: "Jun 21", revenue: 8010, orders: 344, members: 31 },
+    { label: "Jun 28", revenue: 7340, orders: 315, members: 25 },
+    { label: "Jul 5",  revenue: 7910, orders: 361, members: 35 },
+    { label: "Jul 12", revenue: 8412, orders: 356, members: 41 },
+  ];
+  weeks.forEach(w => w.aov = w.revenue / w.orders);
+
+  const genres = [
+    { name: "Fiction",            slot: "red",    revenue: 2340, units: 156 },
+    { name: "Mystery & Thriller", slot: "teal",   revenue: 1870, units: 121 },
+    { name: "Nonfiction",         slot: "yellow", revenue: 1540, units: 98  },
+    { name: "Sci-Fi & Fantasy",   slot: "blue",   revenue: 1290, units: 84  },
+    { name: "Children's",         slot: "green",  revenue: 980,  units: 112 },
+    { name: "Poetry",             slot: "violet", revenue: 392,  units: 34  },
+  ];
+
+  const dow = [
+    { label: "Mon", revenue: 980 },
+    { label: "Tue", revenue: 870 },
+    { label: "Wed", revenue: 1040 },
+    { label: "Thu", revenue: 1120 },
+    { label: "Fri", revenue: 1560 },
+    { label: "Sat", revenue: 1890 },
+    { label: "Sun", revenue: 952 },
+  ];
+
+  const sellers = [
+    { title: "The Coastal Almanac", author: "Wren Ashby",    genre: "Fiction",            units: 34, revenue: 612 },
+    { title: "Marginal Notes",      author: "Priya Kell",    genre: "Nonfiction",         units: 29, revenue: 522 },
+    { title: "The Quiet Ledger",    author: "Tobias Sund",   genre: "Mystery & Thriller", units: 27, revenue: 459 },
+    { title: "Harborlight",         author: "Ines Marchetti",genre: "Sci-Fi & Fantasy",   units: 22, revenue: 396 },
+    { title: "Small Weather",       author: "Priya Kell",    genre: "Poetry",             units: 19, revenue: 228 },
+  ];
+
+  const alerts = [
+    { title: "The Coastal Almanac", meta: "2 copies left on shelf", level: "warning" },
+    { title: "Harborlight",         meta: "Out of stock — 6 on order, arriving Thu", level: "critical" },
+    { title: "Marginal Notes",      meta: "3 copies left on shelf", level: "warning" },
+    { title: "Atlas of Quiet Towns",meta: "1 copy left on shelf",   level: "critical" },
+  ];
+
+  const slotColor = (slot) => tok('--series-' + slot);
+  const fmtUSD = (n) => '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const fmtUSD2 = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtPct = (n) => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+
+  // ---------------- Tooltip (shared) ----------------
+  function makeTooltip(wrap) {
+    const el = document.createElement('div');
+    el.className = 'viz-tooltip';
+    el.setAttribute('role', 'status');
+    wrap.appendChild(el);
+    return {
+      show(x, y, html) {
+        el.innerHTML = '';
+        el.appendChild(html);
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.classList.add('show');
+      },
+      hide() { el.classList.remove('show'); }
+    };
+  }
+  function ttRow(colorVar, label, value) {
+    const wrap = document.createElement('div');
+    const t = document.createElement('div'); t.className = 'tt-title'; t.textContent = label;
+    wrap.appendChild(t);
+    const row = document.createElement('div'); row.className = 'tt-row';
+    const key = document.createElement('span'); key.className = 'tt-key'; key.style.background = colorVar;
+    const val = document.createElement('span'); val.className = 'tt-val'; val.textContent = value;
+    row.appendChild(key); row.appendChild(val);
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  // ---------------- KPI tiles ----------------
+  function sparkPath(values, w, h) {
+    const min = Math.min(...values), max = Math.max(...values);
+    const pad = 3;
+    const x = (i) => (i / (values.length - 1)) * (w - pad * 2) + pad;
+    const y = (v) => h - pad - ((v - min) / (max - min || 1)) * (h - pad * 2);
+    return values.map((v, i) => (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(v).toFixed(1)).join(' ');
+  }
+
+  function buildKpis() {
+    const row = document.getElementById('kpiRow');
+    const last = weeks[weeks.length - 1], prev = weeks[weeks.length - 2];
+    const tiles = [
+      { label: 'Revenue this week', value: fmtUSD(last.revenue), delta: (last.revenue - prev.revenue) / prev.revenue * 100, series: weeks.map(w => w.revenue) },
+      { label: 'Orders', value: last.orders.toLocaleString('en-US'), delta: (last.orders - prev.orders) / prev.orders * 100, series: weeks.map(w => w.orders) },
+      { label: 'Average order value', value: fmtUSD2(last.aov), delta: (last.aov - prev.aov) / prev.aov * 100, series: weeks.map(w => w.aov) },
+      { label: 'New loyalty members', value: last.members.toLocaleString('en-US'), delta: (last.members - prev.members) / prev.members * 100, series: weeks.map(w => w.members) },
+    ];
+    tiles.forEach(t => {
+      const tile = document.createElement('div');
+      tile.className = 'kpi-tile';
+      const up = t.delta >= 0;
+      const svgW = 200, svgH = 32;
+      const muted = tok('--text-muted');
+      const accent = tok('--series-teal');
+      const path = sparkPath(t.series, svgW, svgH);
+      const lastX = svgW - 3, lastY = svgH - 3 - ((t.series[t.series.length-1] - Math.min(...t.series)) / ((Math.max(...t.series) - Math.min(...t.series)) || 1)) * (svgH - 6);
+      tile.innerHTML = `
+        <p class="kpi-label">${t.label}</p>
+        <div class="kpi-value-row">
+          <span class="kpi-value">${t.value}</span>
+          <span class="kpi-delta ${up ? 'up' : 'down'}">${fmtPct(t.delta)}</span>
+        </div>
+        <svg class="kpi-spark" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="none" aria-hidden="true">
+          <path d="${path}" fill="none" stroke="${muted}" stroke-width="1.5" opacity="0.55" />
+          <circle cx="${lastX}" cy="${lastY.toFixed(1)}" r="3" fill="${accent}" stroke="${tok('--surface-1')}" stroke-width="1.5" />
+        </svg>
+        <span class="sr-only">8-week trend, vs prior week ${fmtPct(t.delta)}</span>
+      `;
+      row.appendChild(tile);
+    });
+  }
+
+  // ---------------- Revenue trend chart ----------------
+  let currentRange = 8;
+  function renderTrend() {
+    const wrap = document.getElementById('trendChartWrap');
+    wrap.innerHTML = '';
+    wrap.style.position = 'relative';
+    const data = weeks.slice(weeks.length - currentRange);
+    const W = 640, H = 220, padL = 8, padR = 8, padT = 16, padB = 26;
+    const min = Math.min(...data.map(d => d.revenue));
+    const max = Math.max(...data.map(d => d.revenue));
+    const lo = min - (max - min) * 0.25 || min * 0.9;
+    const hi = max + (max - min) * 0.2 || max * 1.1;
+    const x = (i) => padL + (i / (data.length - 1)) * (W - padL - padR);
+    const y = (v) => H - padB - ((v - lo) / (hi - lo)) * (H - padT - padB);
+
+    const linePath = data.map((d, i) => (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(d.revenue).toFixed(1)).join(' ');
+    const areaPath = linePath + ` L${x(data.length - 1).toFixed(1)},${(H - padB)} L${x(0).toFixed(1)},${(H - padB)} Z`;
+
+    const gridY = [lo + (hi - lo) * 0.25, lo + (hi - lo) * 0.5, lo + (hi - lo) * 0.75];
+
+    const lastVal = data[data.length - 1].revenue;
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('class', 'chart-svg');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', `Revenue trend, last ${currentRange} weeks, ending at ${fmtUSD(lastVal)}`);
+
+    let gridHTML = '';
+    gridY.forEach(gv => {
+      const gy = y(gv);
+      gridHTML += `<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${W - padR}" y2="${gy.toFixed(1)}" stroke="${tok('--grid-line')}" stroke-width="1" />`;
+      gridHTML += `<text x="${padL}" y="${(gy - 4).toFixed(1)}" class="axis-label">${fmtUSD(Math.round(gv / 100) * 100)}</text>`;
+    });
+
+    let xLabelsHTML = '';
+    data.forEach((d, i) => {
+      if (i === 0 || i === data.length - 1 || i === Math.floor((data.length - 1) / 2)) {
+        xLabelsHTML += `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" class="axis-label">${d.label}</text>`;
+      }
+    });
+
+    svg.innerHTML = `
+      ${gridHTML}
+      <path d="${areaPath}" class="area-fill" />
+      <path d="${linePath}" class="trend-line" />
+      <circle cx="${x(data.length - 1).toFixed(1)}" cy="${y(lastVal).toFixed(1)}" r="4.5" fill="${tok('--series-teal')}" stroke="${tok('--surface-1')}" stroke-width="2" />
+      <text x="${(x(data.length - 1) - 6).toFixed(1)}" y="${(y(lastVal) - 12).toFixed(1)}" text-anchor="end" class="end-label-val">${fmtUSD(lastVal)}</text>
+      ${xLabelsHTML}
+      <line class="crosshair-line" id="trendCrosshair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" />
+    `;
+    data.forEach((d, i) => {
+      const dot = document.createElementNS(svgNS, 'circle');
+      dot.setAttribute('cx', x(i).toFixed(1));
+      dot.setAttribute('cy', y(d.revenue).toFixed(1));
+      dot.setAttribute('r', '10');
+      dot.setAttribute('class', 'hit-col');
+      dot.setAttribute('tabindex', '0');
+      dot.setAttribute('data-i', i);
+      svg.appendChild(dot);
+    });
+
+    wrap.appendChild(svg);
+    const tooltip = makeTooltip(wrap);
+    const crosshair = svg.querySelector('#trendCrosshair');
+
+    function activate(i) {
+      const d = data[i];
+      crosshair.setAttribute('x1', x(i).toFixed(1));
+      crosshair.setAttribute('x2', x(i).toFixed(1));
+      crosshair.style.opacity = '1';
+      const rect = wrap.getBoundingClientRect();
+      const px = (x(i) / W) * rect.width;
+      const py = (y(d.revenue) / H) * rect.height;
+      tooltip.show(px, py - 10, ttRow(tok('--series-teal'), 'Week ending ' + d.label, fmtUSD(d.revenue)));
+    }
+    function deactivate() {
+      crosshair.style.opacity = '0';
+      tooltip.hide();
+    }
+    svg.addEventListener('pointermove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width * W;
+      let nearest = 0, best = Infinity;
+      data.forEach((d, i) => { const dist = Math.abs(x(i) - px); if (dist < best) { best = dist; nearest = i; } });
+      activate(nearest);
+    });
+    svg.addEventListener('pointerleave', deactivate);
+    svg.querySelectorAll('.hit-col').forEach(dot => {
+      dot.addEventListener('focus', () => activate(+dot.getAttribute('data-i')));
+      dot.addEventListener('blur', deactivate);
+    });
+
+    const tbody = document.getElementById('trendTableBody');
+    tbody.innerHTML = '';
+    data.forEach(d => {
+      tbody.innerHTML += `<tr><td>${d.label}</td><td class="num">${fmtUSD(d.revenue)}</td></tr>`;
+    });
+  }
+
+  // ---------------- Genre bar chart ----------------
+  function renderGenreLegend() {
+    const legend = document.getElementById('genreLegend');
+    legend.innerHTML = genres.map(g => `
+      <span class="legend-item"><span class="legend-swatch" style="background:${slotColor(g.slot)}"></span>${g.name}</span>
+    `).join('');
+  }
+
+  function renderGenreChart() {
+    const wrap = document.getElementById('genreChartWrap');
+    wrap.innerHTML = '';
+    wrap.style.position = 'relative';
+    const W = 460;
+    const rowH = 34, gap = 6, padL = 118, padR = 56, padT = 4;
+    const H = padT + genres.length * rowH + (genres.length - 1) * gap + 4;
+    const max = Math.max(...genres.map(g => g.revenue));
+    const barX = (v) => (v / max) * (W - padL - padR);
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('class', 'chart-svg');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Sales revenue by genre, this week');
+
+    genres.forEach((g, i) => {
+      const gy = padT + i * (rowH + gap);
+      const bw = barX(g.revenue);
+      const barH = 18;
+      const barY = gy + (rowH - barH) / 2;
+      const grp = document.createElementNS(svgNS, 'g');
+      grp.setAttribute('class', 'bar-hit');
+      grp.setAttribute('tabindex', '0');
+      grp.setAttribute('role', 'img');
+      grp.setAttribute('aria-label', `${g.name}: ${fmtUSD(g.revenue)}, ${g.units} units`);
+      grp.innerHTML = `
+        <text x="${padL - 10}" y="${gy + rowH / 2 + 4}" text-anchor="end" class="bar-cat">${g.name}</text>
+        <rect x="${padL}" y="${barY}" width="${Math.max(bw,3).toFixed(1)}" height="${barH}" rx="4" class="bar" fill="${slotColor(g.slot)}" />
+        <text x="${(padL + bw + 8).toFixed(1)}" y="${gy + rowH / 2 + 4}" class="bar-value">${fmtUSD(g.revenue)}</text>
+        <rect x="${padL}" y="${gy}" width="${W - padL - padR}" height="${rowH}" fill="transparent" class="hitarea" />
+      `;
+      svg.appendChild(grp);
+
+      const tooltip = wrap._tooltip || (wrap._tooltip = makeTooltip(wrap));
+      function activate() {
+        const rect = wrap.getBoundingClientRect();
+        const px = ((padL + bw / 2) / W) * rect.width;
+        const py = (gy / H) * rect.height;
+        tooltip.show(px, py, ttRow(slotColor(g.slot), g.name, `${fmtUSD(g.revenue)} · ${g.units} units`));
+      }
+      grp.addEventListener('pointerenter', activate);
+      grp.addEventListener('pointermove', activate);
+      grp.addEventListener('pointerleave', () => tooltip.hide());
+      grp.addEventListener('focus', activate);
+      grp.addEventListener('blur', () => tooltip.hide());
+    });
+
+    wrap.appendChild(svg);
+
+    const tbody = document.getElementById('genreTableBody');
+    tbody.innerHTML = genres.map(g => `
+      <tr><td><span class="row-swatch" style="background:${slotColor(g.slot)}"></span>${g.name}</td><td class="num">${g.units}</td><td class="num">${fmtUSD(g.revenue)}</td></tr>
+    `).join('');
+  }
+
+  // ---------------- Day-of-week heat strip ----------------
+  function renderDow() {
+    const wrap = document.getElementById('dowChartWrap');
+    wrap.innerHTML = '';
+    wrap.style.position = 'relative';
+    const W = 460, H = 100, gap = 4, padT = 8, padB = 30;
+    const cellW = (W - gap * (dow.length - 1)) / dow.length;
+    const cellH = H - padT - padB;
+    const max = Math.max(...dow.map(d => d.revenue));
+    const min = Math.min(...dow.map(d => d.revenue));
+    const steps = ['--seq-100', '--seq-200', '--seq-300', '--seq-400', '--seq-500', '--seq-600'];
+    const colorFor = (v) => {
+      const t = (v - min) / ((max - min) || 1);
+      const idx = Math.min(steps.length - 1, Math.round(t * (steps.length - 1)));
+      return tok(steps[idx]);
+    };
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('class', 'chart-svg');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Revenue by day of week, this week');
+
+    dow.forEach((d, i) => {
+      const cx = i * (cellW + gap);
+      const isMax = d.revenue === max;
+      const fill = colorFor(d.revenue);
+      const textDark = (steps.indexOf(steps[Math.min(steps.length-1, Math.round(((d.revenue-min)/((max-min)||1))*(steps.length-1)))]) >= 4);
+      const grp = document.createElementNS(svgNS, 'g');
+      grp.setAttribute('class', 'cell-hit');
+      grp.setAttribute('tabindex', '0');
+      grp.setAttribute('role', 'img');
+      grp.setAttribute('aria-label', `${d.label}: ${fmtUSD(d.revenue)}`);
+      grp.innerHTML = `
+        <rect class="cell" x="${cx.toFixed(1)}" y="${padT}" width="${cellW.toFixed(1)}" height="${cellH}" rx="6" fill="${fill}" />
+        ${isMax ? `<text x="${(cx + cellW / 2).toFixed(1)}" y="${padT + cellH / 2 + 4}" text-anchor="middle" class="end-label-val" fill="${textDark ? tok('--surface-1') : tok('--text-primary')}" font-size="12">${fmtUSD(d.revenue)}</text>` : ''}
+        <text x="${(cx + cellW / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle" class="axis-label">${d.label}</text>
+      `;
+      svg.appendChild(grp);
+
+      const tooltip = wrap._tooltip || (wrap._tooltip = makeTooltip(wrap));
+      function activate() {
+        const rect = wrap.getBoundingClientRect();
+        const px = ((cx + cellW / 2) / W) * rect.width;
+        const py = (padT / H) * rect.height;
+        tooltip.show(px, py, ttRow(fill, d.label, fmtUSD(d.revenue)));
+      }
+      grp.addEventListener('pointerenter', activate);
+      grp.addEventListener('pointermove', activate);
+      grp.addEventListener('pointerleave', () => tooltip.hide());
+      grp.addEventListener('focus', activate);
+      grp.addEventListener('blur', () => tooltip.hide());
+    });
+
+    wrap.appendChild(svg);
+  }
+
+  // ---------------- Shelf alerts ----------------
+  function renderAlerts() {
+    const list = document.getElementById('alertList');
+    list.innerHTML = alerts.map(a => `
+      <div class="alert-row">
+        <span class="alert-icon ${a.level}" aria-hidden="true">${a.level === 'critical' ? '!' : '·'}</span>
+        <div class="alert-body">
+          <p class="alert-title">${a.title}</p>
+          <p class="alert-meta">${a.meta}</p>
+        </div>
+        <span class="alert-status ${a.level}">${a.level}</span>
+      </div>
+    `).join('');
+  }
+
+  // ---------------- Top sellers ----------------
+  function renderSellers() {
+    const genreMap = Object.fromEntries(genres.map(g => [g.name, g.slot]));
+    const body = document.getElementById('sellersBody');
+    body.innerHTML = sellers.map(s => `
+      <tr>
+        <td>
+          <div class="book-title">${s.title}</div>
+          <div class="book-author">${s.author}</div>
+        </td>
+        <td><span class="genre-chip"><span class="dot" style="background:${slotColor(genreMap[s.genre])}"></span>${s.genre}</span></td>
+        <td class="num">${s.units}</td>
+        <td class="num">${fmtUSD(s.revenue)}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ---------------- Toggles ----------------
+  document.getElementById('rangeSeg').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    document.querySelectorAll('#rangeSeg button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+    currentRange = +btn.getAttribute('data-range');
+    renderTrend();
+  });
+
+  document.getElementById('trendToggle').addEventListener('click', (e) => {
+    const pressed = e.target.getAttribute('aria-pressed') === 'true';
+    e.target.setAttribute('aria-pressed', String(!pressed));
+    e.target.textContent = pressed ? 'View as table' : 'View as chart';
+    document.getElementById('trendChartWrap').style.display = pressed ? '' : 'none';
+    document.getElementById('trendTable').style.display = pressed ? 'none' : '';
+  });
+  document.getElementById('genreToggle').addEventListener('click', (e) => {
+    const pressed = e.target.getAttribute('aria-pressed') === 'true';
+    e.target.setAttribute('aria-pressed', String(!pressed));
+    e.target.textContent = pressed ? 'View as table' : 'View as chart';
+    document.getElementById('genreChartWrap').style.display = pressed ? '' : 'none';
+    document.getElementById('genreLegend').style.display = pressed ? '' : 'none';
+    document.getElementById('genreTable').style.display = pressed ? 'none' : '';
+  });
+
+  // ---------------- Init ----------------
+  buildKpis();
+  renderGenreLegend();
+  renderTrend();
+  renderGenreChart();
+  renderDow();
+  renderAlerts();
+  renderSellers();
+
+  window.addEventListener('resize', () => { renderTrend(); renderGenreChart(); renderDow(); });
+})();
+</script>

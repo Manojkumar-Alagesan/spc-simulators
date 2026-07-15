@@ -1,0 +1,890 @@
+<title>Trackside — Subgroup Speedway (X̄–R / X̄–S)</title>
+<style>
+  .sp-root {
+    --plane:      #0A0C10;
+    --panel:      #12151B;
+    --panel-2:    #171B22;
+    --panel-3:    #1D222B;
+    --text-primary:   #F3F1E8;
+    --text-secondary: #9BA3AE;
+    --text-muted:     #626A76;
+    --border:         rgba(243,241,232,0.08);
+    --border-strong:  rgba(243,241,232,0.16);
+
+    --accent:     #35C7DA;
+    --accent-ink: #06181B;
+    --accent-2:   #E8A23A;
+
+    --road:       #2B2E33;
+    --shoulder:   #14201A;
+    --shoulder-2: #0F1712;
+    --paint:      #E7E3D6;
+    --curb-a:     #D9433B;
+    --curb-b:     #F3F1E8;
+
+    --good:       #4fd44f;
+    --warning:    #e0a733;
+    --serious:    #ec835a;
+    --critical:   #e05c5c;
+    --good-bg:     rgba(79,212,79,0.14);
+    --warning-bg:  rgba(224,167,51,0.14);
+    --serious-bg:  rgba(236,131,90,0.14);
+    --critical-bg: rgba(224,92,92,0.14);
+
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  .sp-root {
+    background: radial-gradient(ellipse at 50% -10%, #16202A 0%, var(--plane) 55%);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: clamp(18px, 3.5vw, 40px);
+    min-height: 100%;
+  }
+
+  .sp-shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  .sp-header {
+    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+    gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--border-strong);
+  }
+  .sp-eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+  .sp-title { font-weight: 800; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  .sp-subtitle { font-size: 13.5px; color: var(--text-secondary); margin: 6px 0 0; max-width: 52ch; }
+  .sp-stats { font-family: var(--font-mono); display: flex; gap: 22px; }
+  .sp-stat { text-align: right; }
+  .sp-stat .n { font-size: 26px; font-weight: 700; color: var(--critical); line-height: 1; }
+  .sp-stat .n.signal { color: var(--warning); }
+  .sp-stat .l { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); max-width: 15ch; }
+
+  .controls-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .controls-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .transport { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    font-size: 13px; font-weight: 600; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--panel-2); color: var(--text-primary);
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn-ghost {
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-secondary); background: transparent;
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; cursor: pointer;
+  }
+  .btn-ghost:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+  .speedseg, .methodseg { display: inline-flex; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+  .speedseg button, .methodseg button {
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-secondary); background: transparent;
+    border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer;
+  }
+  .speedseg button[aria-pressed="true"], .methodseg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .speedseg button:focus-visible, .methodseg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .sliders-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 20px; }
+  @media (max-width: 760px) { .sliders-grid { grid-template-columns: repeat(2, 1fr); } }
+  .slider-field { display: flex; flex-direction: column; gap: 6px; }
+  .slider-field label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--text-secondary); }
+  .slider-field .sv { font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .slider-field input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 3px; background: var(--border-strong); outline: none; }
+  .slider-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent);
+    border: 2px solid var(--panel); cursor: pointer; margin-top: -6px;
+  }
+  .slider-field input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); cursor: pointer; }
+  .slider-field input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .slider-hint { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; }
+  .method-field { display: flex; flex-direction: column; gap: 6px; }
+  .method-field label { font-size: 12px; color: var(--text-secondary); }
+
+  .invalid-banner { display: none; font-size: 12.5px; color: var(--critical); background: var(--critical-bg); border: 1px solid var(--critical); border-radius: 8px; padding: 8px 12px; }
+  .invalid-banner.show { display: block; }
+
+  .main-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; align-items: start; }
+  @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .card-title { font-size: 14.5px; font-weight: 700; margin: 0; }
+  .card-sub { font-size: 11.5px; color: var(--text-muted); margin: 0; }
+
+  .track-wrap { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-strong); }
+  #trackCanvas { display: block; width: 100%; height: 460px; background: var(--shoulder); }
+  .track-flash { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 0 rgba(224,92,92,0); transition: box-shadow .15s ease; }
+  .track-flash.on { box-shadow: inset 0 0 60px 8px rgba(224,92,92,0.55); }
+  .track-flash.signal { box-shadow: inset 0 0 44px 6px rgba(224,167,51,0.45); }
+  .track-toast {
+    position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--critical);
+    background: rgba(10,12,16,0.85); border: 1px solid var(--critical); border-radius: 20px;
+    padding: 5px 12px; opacity: 0; transition: opacity .2s ease; pointer-events: none; letter-spacing: 0.03em;
+  }
+  .track-toast.show { opacity: 1; }
+  .track-toast.signal { color: var(--warning); border-color: var(--warning); }
+
+  .hud-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .hud-tile { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; display: flex; flex-direction: column; gap: 4px; }
+  .hud-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+  .hud-value { font-family: var(--font-mono); font-size: 23px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .hud-badge {
+    align-self: flex-start; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 20px; margin-top: 2px; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .hud-badge.good { background: var(--good-bg); color: var(--good); }
+  .hud-badge.warning { background: var(--warning-bg); color: var(--warning); }
+  .hud-badge.serious { background: var(--serious-bg); color: var(--serious); }
+  .hud-badge.critical { background: var(--critical-bg); color: var(--critical); }
+  .hud-badge::before { content: "●"; font-size: 8px; }
+  .hud-tile.wide { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
+  .hud-tile.wide .hud-cl-values { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .hud-tile.wide .hud-cl-values b { color: var(--text-primary); font-weight: 700; }
+
+  .chart-axis-label { font-family: var(--font-mono); font-size: 9.5px; }
+  .chart-key { display: flex; gap: 12px 14px; flex-wrap: wrap; font-size: 11px; color: var(--text-secondary); }
+  .chart-key span { display: inline-flex; align-items: center; gap: 5px; }
+  .chart-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .chart-block { display: flex; flex-direction: column; gap: 4px; }
+  .chart-block-title { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-secondary); }
+  .chart-svg-wrap { position: relative; }
+  .chart-svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .viz-tooltip {
+    position: absolute; pointer-events: none; background: var(--panel-3); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 7px 10px; font-size: 11.5px; color: var(--text-secondary);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4); opacity: 0; transform: translate(-50%, -100%);
+    white-space: nowrap; z-index: 5; transition: opacity .1s ease;
+  }
+  .viz-tooltip.show { opacity: 1; }
+  .viz-tooltip .tt-title { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .viz-tooltip .tt-val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track-flash, .track-toast, .btn, .hud-value { transition: none !important; }
+  }
+</style>
+
+<div class="sp-root">
+  <div class="sp-shell">
+
+    <header class="sp-header">
+      <div>
+        <p class="sp-eyebrow">SPC Capability Speedway — Subgroups</p>
+        <h1 class="sp-title">Trackside: Fleet Edition</h1>
+        <p class="sp-subtitle">Machined bore diameter (mm) — each lap sends a fleet of n cars around the track together. Pack position = subgroup mean (X̄); pack width = subgroup range or spread (R / S).</p>
+      </div>
+      <div class="sp-stats">
+        <div class="sp-stat">
+          <div class="n" id="crashCount">0</div>
+          <div class="l">Off-spec units</div>
+        </div>
+        <div class="sp-stat">
+          <div class="n signal" id="signalCount">0</div>
+          <div class="l">OOC signals (X̄ or R/S)</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="controls-card">
+      <div class="controls-top">
+        <div class="transport">
+          <button class="btn primary" id="playBtn" type="button">Pause</button>
+          <button class="btn" id="resetBtn" type="button">Reset run</button>
+          <div class="speedseg" id="speedSeg" role="group" aria-label="Lap speed">
+            <button type="button" data-speed="2400" aria-pressed="false">Slow</button>
+            <button type="button" data-speed="1400" aria-pressed="true">Medium</button>
+            <button type="button" data-speed="700" aria-pressed="false">Fast</button>
+          </div>
+        </div>
+        <div class="presets" role="group" aria-label="Scenario presets">
+          <button class="btn-ghost" data-preset="capable">Centered &amp; tight</button>
+          <button class="btn-ghost" data-preset="offcenter">Off-center</button>
+          <button class="btn-ghost" data-preset="highvar">High variation</button>
+          <button class="btn-ghost" id="recalcBtn" type="button" title="Re-baseline control limits &amp; short-term Cp/Cpk from the most recent 20 subgroups">Recalc baseline</button>
+        </div>
+      </div>
+
+      <div class="invalid-banner" id="invalidBanner">USL must be greater than LSL — capability can't be computed until the spec window is valid.</div>
+
+      <div class="sliders-grid">
+        <div class="slider-field">
+          <label>Process mean (μ) <span class="sv" id="meanVal">50.0</span></label>
+          <input type="range" id="meanSlider" min="10" max="90" step="0.5" value="50">
+          <span class="slider-hint">True generating mean, used only to draw samples.</span>
+        </div>
+        <div class="slider-field">
+          <label>Process sigma (σ) <span class="sv" id="sigmaVal">2.5</span></label>
+          <input type="range" id="sigmaSlider" min="0.2" max="9" step="0.1" value="2.5">
+          <span class="slider-hint">True generating sigma, used only to draw samples.</span>
+        </div>
+        <div class="slider-field">
+          <label>Subgroup size (n) <span class="sv" id="nVal">5</span></label>
+          <input type="range" id="nSlider" min="2" max="10" step="1" value="5">
+          <span class="slider-hint">Cars per lap / rational subgroup size.</span>
+        </div>
+        <div class="slider-field">
+          <label>Upper spec limit (USL) <span class="sv" id="uslVal">65.0</span></label>
+          <input type="range" id="uslSlider" min="40" max="95" step="0.5" value="65">
+        </div>
+        <div class="slider-field">
+          <label>Lower spec limit (LSL) <span class="sv" id="lslVal">35.0</span></label>
+          <input type="range" id="lslSlider" min="5" max="60" step="0.5" value="35">
+        </div>
+        <div class="method-field">
+          <label>Dispersion statistic</label>
+          <div class="methodseg" id="methodSeg" role="group" aria-label="Dispersion statistic">
+            <button type="button" data-method="R" aria-pressed="true">Range (R)</button>
+            <button type="button" data-method="S" aria-pressed="false">Std dev (S)</button>
+          </div>
+          <span class="slider-hint">R is classic for n ≤ 10; S works at any n. Changes which chart and constants (A2/D3/D4 vs A3/B3/B4) are used.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <section class="card" aria-label="Track view">
+        <div class="card-head">
+          <div>
+            <p class="card-title">Live track — fleet view</p>
+            <p class="card-sub">Curbs mark USL / LSL (spec, per unit) · dashed lane lines mark the X̄ chart's control limits (per subgroup mean)</p>
+          </div>
+        </div>
+        <div class="track-wrap">
+          <canvas id="trackCanvas"></canvas>
+          <div class="track-flash" id="trackFlash"></div>
+          <div class="track-toast" id="trackToast">OFF TRACK</div>
+        </div>
+      </section>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <section class="card" aria-label="Capability readout">
+          <div class="card-head">
+            <div>
+              <p class="card-title">Capability readout</p>
+              <p class="card-sub">Short-term (from R̄/d2 or s̄/c4, frozen at baseline) vs. overall (pooled individuals) · bands per AIAG SPC manual</p>
+            </div>
+          </div>
+          <div class="hud-grid" id="hudGrid"></div>
+        </section>
+
+        <section class="card" aria-label="X-bar and R/S charts">
+          <div class="card-head">
+            <div>
+              <p class="card-title">Subgroup history</p>
+              <p class="card-sub" id="sampleCount">0 subgroups collected</p>
+            </div>
+          </div>
+          <div class="chart-key">
+            <span><i style="background:var(--good)"></i>In control</span>
+            <span><i style="background:var(--warning)"></i>Out of control</span>
+          </div>
+          <div class="chart-block">
+            <span class="chart-block-title" id="xbarChartTitle">X̄ chart</span>
+            <div class="chart-svg-wrap" id="xbarChartWrap"></div>
+          </div>
+          <div class="chart-block">
+            <span class="chart-block-title" id="dispChartTitle">R chart</span>
+            <div class="chart-svg-wrap" id="dispChartWrap"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const root = document.querySelector('.sp-root');
+  const cs = getComputedStyle(root);
+  const tok = (name) => cs.getPropertyValue(name).trim();
+
+  // Standard control-chart constants, n = 2..10 (Montgomery / AIAG SPC manual tables)
+  const CONST = {
+    A2: {2:1.880,3:1.023,4:0.729,5:0.577,6:0.483,7:0.419,8:0.373,9:0.337,10:0.308},
+    D3: {2:0,    3:0,    4:0,    5:0,    6:0,    7:0.076,8:0.136,9:0.184,10:0.223},
+    D4: {2:3.267,3:2.574,4:2.282,5:2.114,6:2.004,7:1.924,8:1.864,9:1.816,10:1.777},
+    d2: {2:1.128,3:1.693,4:2.059,5:2.326,6:2.534,7:2.704,8:2.847,9:2.970,10:3.078},
+    A3: {2:2.659,3:1.954,4:1.628,5:1.427,6:1.287,7:1.182,8:1.099,9:1.032,10:0.975},
+    B3: {2:0,    3:0,    4:0,    5:0,    6:0.030,7:0.118,8:0.185,9:0.239,10:0.284},
+    B4: {2:3.267,3:2.568,4:2.266,5:2.089,6:1.970,7:1.882,8:1.815,9:1.761,10:1.716},
+    c4: {2:0.7979,3:0.8862,4:0.9213,5:0.9400,6:0.9515,7:0.9594,8:0.9650,9:0.9693,10:0.9727},
+  };
+
+  const els = {
+    mean: document.getElementById('meanSlider'),
+    sigma: document.getElementById('sigmaSlider'),
+    nSlider: document.getElementById('nSlider'),
+    usl: document.getElementById('uslSlider'),
+    lsl: document.getElementById('lslSlider'),
+    meanVal: document.getElementById('meanVal'),
+    sigmaVal: document.getElementById('sigmaVal'),
+    nVal: document.getElementById('nVal'),
+    uslVal: document.getElementById('uslVal'),
+    lslVal: document.getElementById('lslVal'),
+    methodSeg: document.getElementById('methodSeg'),
+    playBtn: document.getElementById('playBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    speedSeg: document.getElementById('speedSeg'),
+    presetsRow: document.querySelector('.presets'),
+    recalcBtn: document.getElementById('recalcBtn'),
+    invalidBanner: document.getElementById('invalidBanner'),
+    crashCount: document.getElementById('crashCount'),
+    signalCount: document.getElementById('signalCount'),
+    hudGrid: document.getElementById('hudGrid'),
+    xbarChartWrap: document.getElementById('xbarChartWrap'),
+    dispChartWrap: document.getElementById('dispChartWrap'),
+    xbarChartTitle: document.getElementById('xbarChartTitle'),
+    dispChartTitle: document.getElementById('dispChartTitle'),
+    sampleCount: document.getElementById('sampleCount'),
+    trackFlash: document.getElementById('trackFlash'),
+    trackToast: document.getElementById('trackToast'),
+    canvas: document.getElementById('trackCanvas'),
+  };
+
+  // ---------------- State ----------------
+  const BASELINE_N = 20; // subgroups
+  let running = true;
+  let speedMs = 1400;
+  let sampleTimer = null;
+  let method = 'R'; // 'R' or 'S'
+  let subgroups = []; // {i, vals[], mean, range, sd, passFlags[], defectiveCount, allPass, meanInControl, dispInControl}
+  let crashCount = 0;   // individual off-spec units
+  let signalCount = 0;  // OOC subgroup signals (X-bar or disp)
+  let sampleIndex = 0;
+  let baseline = null;  // {grandMean, xUcl, xLcl, dispCl, dispUcl, dispLcl, sigmaEst, method, n}
+
+  let packCenterX = 50;
+  let packTargetX = 50;
+  let packPrevX = 50;
+
+  function params() {
+    return {
+      mean: +els.mean.value,
+      sigma: +els.sigma.value,
+      n: +els.nSlider.value,
+      usl: +els.usl.value,
+      lsl: +els.lsl.value,
+    };
+  }
+  function specValid(p) { return p.usl > p.lsl; }
+
+  // ---------------- RNG ----------------
+  function normalSample(mean, sigma) {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    return mean + z * sigma;
+  }
+
+  // ---------------- Baseline: control limits + short-term Cp/Cpk ----------------
+  // Subgroups make a genuine short-term sigma estimate possible (unlike the
+  // individuals speedway): sigma-hat = R-bar/d2 (or s-bar/c4), the classic
+  // AIAG way to feed Cp/Cpk. Frozen at baseline, like the control limits.
+  function computeBaseline(rows, n, useS) {
+    const k = rows.length;
+    if (k < 2) return null;
+    const grandMean = rows.reduce((a, r) => a + r.mean, 0) / k;
+    if (useS) {
+      const sBar = rows.reduce((a, r) => a + r.sd, 0) / k;
+      const c4 = CONST.c4[n];
+      return {
+        method: 'S', n, grandMean,
+        xUcl: grandMean + CONST.A3[n] * sBar, xLcl: grandMean - CONST.A3[n] * sBar,
+        dispCl: sBar, dispUcl: CONST.B4[n] * sBar, dispLcl: CONST.B3[n] * sBar,
+        sigmaEst: sBar / c4,
+      };
+    }
+    const rBar = rows.reduce((a, r) => a + r.range, 0) / k;
+    const d2 = CONST.d2[n];
+    return {
+      method: 'R', n, grandMean,
+      xUcl: grandMean + CONST.A2[n] * rBar, xLcl: grandMean - CONST.A2[n] * rBar,
+      dispCl: rBar, dispUcl: CONST.D4[n] * rBar, dispLcl: CONST.D3[n] * rBar,
+      sigmaEst: rBar / d2,
+    };
+  }
+
+  function computeTargetCapability(p) {
+    if (!specValid(p) || !baseline || baseline.sigmaEst <= 0) return null;
+    const cp = (p.usl - p.lsl) / (6 * baseline.sigmaEst);
+    const cpk = Math.min((p.usl - baseline.grandMean) / (3 * baseline.sigmaEst), (baseline.grandMean - p.lsl) / (3 * baseline.sigmaEst));
+    return { cp, cpk };
+  }
+  function computeOverall(p) {
+    if (!specValid(p)) return null;
+    const vals = [];
+    let defective = 0, total = 0;
+    subgroups.forEach(r => { r.vals.forEach((v, idx) => { vals.push(v); total++; if (!r.passFlags[idx]) defective++; }); });
+    const n = vals.length;
+    if (n < 2) return null;
+    const mean = vals.reduce((a, b) => a + b, 0) / n;
+    const variance = vals.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (n - 1);
+    const sd = Math.sqrt(variance);
+    if (sd <= 0) return null;
+    const pp = (p.usl - p.lsl) / (6 * sd);
+    const ppk = Math.min((p.usl - mean) / (3 * sd), (mean - p.lsl) / (3 * sd));
+    const yieldPct = (total - defective) / total * 100;
+    return { pp, ppk, mean, sd, yieldPct, n: total };
+  }
+
+  // AIAG SPC manual capability guidance (same bands as the individuals speedway)
+  function capabilityBadge(v) {
+    if (v == null || !isFinite(v)) return { cls: 'critical', label: 'N/A' };
+    if (v < 1.0) return { cls: 'critical', label: 'Not capable' };
+    if (v < 1.33) return { cls: 'serious', label: 'Marginal' };
+    if (v < 1.67) return { cls: 'good', label: 'Capable' };
+    return { cls: 'good', label: 'Capable (critical)' };
+  }
+
+  const fmt2 = (n) => (n == null || !isFinite(n)) ? '—' : n.toFixed(2);
+  const fmt1 = (n) => (n == null || !isFinite(n)) ? '—' : n.toFixed(1);
+
+  // ---------------- HUD ----------------
+  function renderHud() {
+    const p = params();
+    const t = computeTargetCapability(p);
+    const o = computeOverall(p);
+
+    const cpBadge = t ? capabilityBadge(t.cp) : { cls: 'critical', label: 'N/A' };
+    const cpkBadge = t ? capabilityBadge(t.cpk) : { cls: 'critical', label: 'N/A' };
+    const ppBadge = o ? capabilityBadge(o.pp) : { cls: 'critical', label: '—' };
+    const ppkBadge = o ? capabilityBadge(o.ppk) : { cls: 'critical', label: '—' };
+    const yBadge = ppkBadge; // yield inherits Ppk's tier — see individuals speedway rationale
+
+    els.hudGrid.innerHTML = `
+      <div class="hud-tile">
+        <span class="hud-label">Cp (short-term)</span>
+        <span class="hud-value">${t ? fmt2(t.cp) : '—'}</span>
+        <span class="hud-badge ${cpBadge.cls}">${cpBadge.label}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Cpk (short-term)</span>
+        <span class="hud-value">${t ? fmt2(t.cpk) : '—'}</span>
+        <span class="hud-badge ${cpkBadge.cls}">${cpkBadge.label}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Pp (overall)</span>
+        <span class="hud-value">${o ? fmt2(o.pp) : '—'}</span>
+        <span class="hud-badge ${ppBadge.cls}">${o ? ppBadge.label : 'Collecting…'}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Ppk (overall)</span>
+        <span class="hud-value">${o ? fmt2(o.ppk) : '—'}</span>
+        <span class="hud-badge ${ppkBadge.cls}">${o ? ppkBadge.label : 'Collecting…'}</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Yield (overall)</span>
+        <span class="hud-value">${o ? fmt1(o.yieldPct) + '%' : '—'}</span>
+        <span class="hud-badge ${yBadge.cls}">${o ? yBadge.label : 'Collecting…'}</span>
+        <span style="font-size:10px;color:var(--text-muted);">AIAG sets no yield cutoff — shown at Ppk's tier</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">Grand mean / short-term σ</span>
+        <span class="hud-value" style="font-size:17px;">${baseline ? fmt2(baseline.grandMean) + ' / ' + fmt2(baseline.sigmaEst) : '—'}</span>
+        <span class="hud-badge good" style="visibility:${baseline ? 'visible' : 'hidden'}">n/subgroup = ${baseline ? baseline.n : 0}</span>
+      </div>
+      <div class="hud-tile wide">
+        <div>
+          <span class="hud-label">X̄ chart</span>
+          <div>${chartBadge('x')}</div>
+        </div>
+        <div class="hud-cl-values">${baseline ? `UCL <b>${fmt2(baseline.xUcl)}</b> · CL <b>${fmt2(baseline.grandMean)}</b> · LCL <b>${fmt2(baseline.xLcl)}</b>` : `Baseline: ${Math.min(subgroups.length, BASELINE_N)}/${BASELINE_N} subgroups`}</div>
+      </div>
+      <div class="hud-tile wide">
+        <div>
+          <span class="hud-label">${method === 'S' ? 'S chart' : 'R chart'}</span>
+          <div>${chartBadge('disp')}</div>
+        </div>
+        <div class="hud-cl-values">${baseline ? `UCL <b>${fmt2(baseline.dispUcl)}</b> · CL <b>${fmt2(baseline.dispCl)}</b> · LCL <b>${fmt2(baseline.dispLcl)}</b>` : `Baseline: ${Math.min(subgroups.length, BASELINE_N)}/${BASELINE_N} subgroups`}</div>
+      </div>
+    `;
+    els.invalidBanner.classList.toggle('show', !specValid(p));
+    els.sampleCount.textContent = subgroups.length + ' subgroup' + (subgroups.length === 1 ? '' : 's') + ' collected (n=' + p.n + ' each)'
+      + (baseline ? '' : ` · establishing baseline (${Math.min(subgroups.length, BASELINE_N)}/${BASELINE_N})`);
+    els.xbarChartTitle.textContent = 'X̄ chart';
+    els.dispChartTitle.textContent = method === 'S' ? 'S chart' : 'R chart';
+  }
+
+  function chartBadge(which) {
+    if (!baseline) return `<span class="hud-badge warning">Establishing baseline</span>`;
+    const last = subgroups[subgroups.length - 1];
+    const inControl = which === 'x' ? (last && last.meanInControl) : (last && last.dispInControl);
+    if (inControl === false) return `<span class="hud-badge warning">Out of control</span>`;
+    return `<span class="hud-badge good">In control</span>`;
+  }
+
+  // ---------------- Track canvas (fleet view) ----------------
+  let dims = { w: 0, h: 0, dpr: 1 };
+  const ctx = els.canvas.getContext('2d');
+
+  function setupCanvas() {
+    const rect = els.canvas.getBoundingClientRect();
+    dims.dpr = window.devicePixelRatio || 1;
+    dims.w = rect.width; dims.h = rect.height;
+    els.canvas.width = Math.round(dims.w * dims.dpr);
+    els.canvas.height = Math.round(dims.h * dims.dpr);
+    ctx.setTransform(dims.dpr, 0, 0, dims.dpr, 0, 0);
+  }
+
+  function viewRange(p) {
+    if (!specValid(p)) { const m = p.mean, s = Math.max(p.sigma, 0.5); return { min: m - 4 * s, max: m + 4 * s }; }
+    const span = p.usl - p.lsl, margin = span * 0.4;
+    return { min: p.lsl - margin, max: p.usl + margin };
+  }
+  function valueToX(val, p) {
+    const vr = viewRange(p);
+    const t = (val - vr.min) / (vr.max - vr.min);
+    const roadLeft = dims.w * 0.08, roadWidth = dims.w * 0.84;
+    return roadLeft + Math.min(Math.max(t, -0.2), 1.2) * roadWidth;
+  }
+
+  let scrollOffset = 0, wobbleT = 0, lastFrame = null;
+
+  function drawMiniCar(x, y, scale, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.ellipse(0, 9, 8, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.roundRect(-6, -11, 12, 22, 5); ctx.fill();
+    ctx.fillStyle = tok('--panel-3');
+    ctx.beginPath(); ctx.roundRect(-3.5, -6, 7, 7, 2); ctx.fill();
+    ctx.restore();
+  }
+  function drawPaceMarker(x, y, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, -10); ctx.lineTo(7, 0); ctx.lineTo(0, 10); ctx.lineTo(-7, 0);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = tok('--panel'); ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+  }
+  function drawDashed(xc, color, alpha, width, dash) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width || 2;
+    ctx.setLineDash(dash || [12, 10]);
+    ctx.lineDashOffset = -scrollOffset;
+    ctx.beginPath(); ctx.moveTo(xc, 0); ctx.lineTo(xc, dims.h); ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(ts) {
+    if (!lastFrame) lastFrame = ts;
+    const dt = Math.min(48, ts - lastFrame);
+    lastFrame = ts;
+
+    const p = params();
+    const carY = dims.h * 0.72;
+
+    if (running) { scrollOffset = (scrollOffset + dt * 0.11) % 40; wobbleT += dt; }
+
+    packCenterX += (packTargetX - packCenterX) * Math.min(1, dt / 260);
+    const xBase = valueToX(packCenterX, p);
+    const steer = Math.max(-0.25, Math.min(0.25, (xBase - packPrevX) * 0.04));
+    packPrevX = packPrevX + (xBase - packPrevX) * 0.4;
+
+    ctx.clearRect(0, 0, dims.w, dims.h);
+    ctx.fillStyle = tok('--shoulder-2');
+    ctx.fillRect(0, 0, dims.w, dims.h);
+
+    const roadLeft = dims.w * 0.08, roadWidth = dims.w * 0.84;
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 10;
+    for (let i = -1; i < dims.h / 26 + 1; i++) {
+      const yy = i * 26 + (scrollOffset % 26);
+      ctx.beginPath(); ctx.moveTo(roadLeft * 0.3, yy); ctx.lineTo(roadLeft * 0.3 + 40, yy - 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(dims.w - roadLeft * 0.3, yy); ctx.lineTo(dims.w - roadLeft * 0.3 - 40, yy - 40); ctx.stroke();
+    }
+
+    ctx.fillStyle = tok('--road');
+    ctx.fillRect(roadLeft, 0, roadWidth, dims.h);
+
+    if (specValid(p)) {
+      const xL = valueToX(p.lsl, p), xU = valueToX(p.usl, p);
+      [xL, xU].forEach((xc) => {
+        const stripeW = 9;
+        ctx.save(); ctx.beginPath(); ctx.rect(xc - stripeW / 2, 0, stripeW, dims.h); ctx.clip();
+        const step = 16;
+        for (let i = -2; i < dims.h / step + 2; i++) {
+          const yy = i * step + (scrollOffset % step);
+          ctx.fillStyle = (i % 2 === 0) ? tok('--curb-a') : tok('--curb-b');
+          ctx.beginPath();
+          ctx.moveTo(xc - stripeW, yy); ctx.lineTo(xc, yy - step); ctx.lineTo(xc + stripeW, yy - step); ctx.lineTo(xc, yy);
+          ctx.closePath(); ctx.fill();
+        }
+        ctx.restore();
+      });
+      const xNom = valueToX((p.usl + p.lsl) / 2, p);
+      drawDashed(xNom, tok('--paint'), 0.5);
+    }
+
+    if (baseline) {
+      drawDashed(valueToX(baseline.xUcl, p), tok('--warning'), 0.75, 1.4, [7, 6]);
+      drawDashed(valueToX(baseline.xLcl, p), tok('--warning'), 0.75, 1.4, [7, 6]);
+      drawDashed(valueToX(baseline.grandMean, p), tok('--accent'), 0.5, 1, [2, 5]);
+    }
+
+    // trailing packs (fading fleets from previous laps)
+    const trail = subgroups.slice(-14);
+    trail.forEach((row, idx) => {
+      const rowsFromBottom = trail.length - idx;
+      const y = carY - rowsFromBottom * 24 + 24;
+      if (y < -20) return;
+      const alpha = idx === trail.length - 1 ? 1 : 0.14 + 0.55 * (idx / trail.length);
+      ctx.globalAlpha = alpha;
+      row.vals.forEach((v, i) => {
+        const jitter = (i - (row.vals.length - 1) / 2) * 0.6;
+        drawMiniCar(valueToX(v, p) + jitter, y, idx === trail.length - 1 ? 0.85 : 0.6, row.passFlags[i] ? tok('--accent') : tok('--critical'));
+      });
+      drawPaceMarker(valueToX(row.mean, p), y, row.meanInControl === false ? tok('--warning') : tok('--paint'));
+      ctx.globalAlpha = 1;
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  // ---------------- Strip charts (SVG) ----------------
+  function makeTooltip(wrap) {
+    let el = wrap.querySelector('.viz-tooltip');
+    if (!el) { el = document.createElement('div'); el.className = 'viz-tooltip'; wrap.appendChild(el); }
+    return {
+      show(x, y, title, value, color) {
+        el.innerHTML = `<div class="tt-title">${title}</div><div class="tt-val" style="color:${color}">${value}</div>`;
+        el.style.left = x + 'px'; el.style.top = y + 'px'; el.classList.add('show');
+      },
+      hide() { el.classList.remove('show'); }
+    };
+  }
+
+  function renderRunChart(wrap, data, opts) {
+    const W = 460, H = 170, padL = 44, padR = 10, padT = 10, padB = 20;
+    const svgNS = 'http://www.w3.org/2000/svg';
+    let svg = wrap.querySelector('svg');
+    if (!svg) { svg = document.createElementNS(svgNS, 'svg'); svg.setAttribute('class', 'chart-svg'); svg.setAttribute('role', 'img'); wrap.insertBefore(svg, wrap.firstChild); }
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('aria-label', opts.label + ': ' + data.length + ' points');
+
+    const vals = data.map(opts.getValue);
+    let lo = opts.fixedMin != null ? opts.fixedMin : Math.min(...vals, opts.cl != null ? opts.cl : Infinity, opts.lcl != null ? opts.lcl : Infinity);
+    let hi = opts.fixedMax != null ? opts.fixedMax : Math.max(...vals, opts.cl != null ? opts.cl : -Infinity, opts.ucl != null ? opts.ucl : -Infinity);
+    if (!isFinite(lo) || !isFinite(hi) || lo === hi) { lo = (vals[0] || 0) - 1; hi = (vals[0] || 0) + 1; }
+    const pad = (hi - lo) * 0.15 || 1;
+    lo -= pad; hi += pad;
+
+    const x = (i) => padL + (data.length <= 1 ? 0 : (i / Math.max(data.length - 1, 1)) * (W - padL - padR));
+    const y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+
+    let html = '';
+    const muted = tok('--text-muted');
+
+    if (opts.ucl != null) {
+      const yU = y(opts.ucl), yL = y(opts.lcl), yC = y(opts.cl);
+      html += `<line x1="${padL}" y1="${yU.toFixed(1)}" x2="${W-padR}" y2="${yU.toFixed(1)}" stroke="${tok('--warning')}" stroke-width="1.3" stroke-dasharray="4 4" opacity="0.85"/>`;
+      html += `<text x="${W-padR}" y="${(yU-4).toFixed(1)}" text-anchor="end" class="chart-axis-label" fill="${tok('--warning')}">UCL ${opts.ucl.toFixed(2)}</text>`;
+      html += `<line x1="${padL}" y1="${yL.toFixed(1)}" x2="${W-padR}" y2="${yL.toFixed(1)}" stroke="${tok('--warning')}" stroke-width="1.3" stroke-dasharray="4 4" opacity="0.85"/>`;
+      html += `<text x="${W-padR}" y="${(yL+12).toFixed(1)}" text-anchor="end" class="chart-axis-label" fill="${tok('--warning')}">LCL ${Math.max(opts.lcl,0).toFixed(2)}</text>`;
+      html += `<line x1="${padL}" y1="${yC.toFixed(1)}" x2="${W-padR}" y2="${yC.toFixed(1)}" stroke="${muted}" stroke-width="1" stroke-dasharray="2 4" opacity="0.6"/>`;
+    }
+
+    if (data.length > 1) {
+      let path = '';
+      data.forEach((d, i) => { path += (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(opts.getValue(d)).toFixed(1) + ' '; });
+      html += `<path d="${path}" fill="none" stroke="${tok('--accent')}" stroke-width="1.6" opacity="0.55" stroke-linejoin="round"/>`;
+    }
+
+    data.forEach((d, i) => {
+      const cx = x(i), cy = y(opts.getValue(d));
+      const inControl = opts.getInControl(d);
+      const color = inControl === false ? tok('--warning') : tok('--good');
+      html += `<circle class="pt" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.2" fill="${color}" stroke="${tok('--panel')}" stroke-width="1"/>`;
+      html += `<circle class="pt-hit" data-i="${i}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="10" fill="transparent" tabindex="0"/>`;
+    });
+
+    svg.innerHTML = html;
+    const tooltip = makeTooltip(wrap);
+    svg.querySelectorAll('.pt-hit').forEach((hit) => {
+      const i = +hit.getAttribute('data-i');
+      const d = data[i];
+      const inControl = opts.getInControl(d);
+      function activate() {
+        const rect = wrap.getBoundingClientRect();
+        const px = (+hit.getAttribute('cx') / W) * rect.width;
+        const py = (+hit.getAttribute('cy') / H) * rect.height;
+        const color = inControl === false ? tok('--warning') : tok('--good');
+        tooltip.show(px, py - 8, opts.label + ' — subgroup #' + d.i, opts.getValue(d).toFixed(2) + (inControl === false ? ' · out of control' : ' · in control'), color);
+      }
+      hit.addEventListener('pointerenter', activate);
+      hit.addEventListener('pointermove', activate);
+      hit.addEventListener('pointerleave', () => tooltip.hide());
+      hit.addEventListener('focus', activate);
+      hit.addEventListener('blur', () => tooltip.hide());
+    });
+  }
+
+  function renderCharts() {
+    const data = subgroups.slice(-40);
+    renderRunChart(els.xbarChartWrap, data, {
+      label: 'X̄',
+      getValue: (d) => d.mean,
+      getInControl: (d) => d.meanInControl,
+      ucl: baseline ? baseline.xUcl : null, lcl: baseline ? baseline.xLcl : null, cl: baseline ? baseline.grandMean : null,
+    });
+    renderRunChart(els.dispChartWrap, data, {
+      label: method === 'S' ? 'S' : 'R',
+      getValue: (d) => method === 'S' ? d.sd : d.range,
+      getInControl: (d) => d.dispInControl,
+      ucl: baseline ? baseline.dispUcl : null, lcl: baseline ? baseline.dispLcl : null, cl: baseline ? baseline.dispCl : null,
+      fixedMin: 0,
+    });
+  }
+
+  // ---------------- Sampling ----------------
+  function tick() {
+    const p = params();
+    const vals = Array.from({ length: p.n }, () => normalSample(p.mean, p.sigma));
+    const mean = vals.reduce((a, b) => a + b, 0) / p.n;
+    const range = Math.max(...vals) - Math.min(...vals);
+    const variance = p.n > 1 ? vals.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (p.n - 1) : 0;
+    const sd = Math.sqrt(variance);
+    const passFlags = vals.map(v => specValid(p) ? (v >= p.lsl && v <= p.usl) : true);
+    const defectiveCount = passFlags.filter(f => !f).length;
+
+    const dispVal = method === 'S' ? sd : range;
+    const meanInControl = baseline ? (mean >= baseline.xLcl && mean <= baseline.xUcl) : null;
+    const dispInControl = baseline ? (dispVal >= baseline.dispLcl && dispVal <= baseline.dispUcl) : null;
+
+    sampleIndex++;
+    subgroups.push({ i: sampleIndex, vals, mean, range, sd, passFlags, defectiveCount, meanInControl, dispInControl });
+    if (subgroups.length > 200) subgroups.shift();
+
+    if (!baseline && subgroups.length >= BASELINE_N) {
+      baseline = computeBaseline(subgroups.slice(0, BASELINE_N), p.n, method === 'S');
+    }
+
+    packPrevX = packCenterX;
+    packTargetX = mean;
+
+    if (defectiveCount > 0) {
+      crashCount += defectiveCount;
+      els.crashCount.textContent = crashCount;
+      els.trackFlash.classList.remove('signal'); els.trackFlash.classList.add('on');
+      els.trackToast.classList.remove('signal');
+      els.trackToast.textContent = 'OFF SPEC — ' + defectiveCount + ' of ' + p.n + ' units';
+      els.trackToast.classList.add('show');
+      setTimeout(() => els.trackFlash.classList.remove('on'), 260);
+      setTimeout(() => els.trackToast.classList.remove('show'), 900);
+    } else if (meanInControl === false || dispInControl === false) {
+      signalCount++;
+      els.signalCount.textContent = signalCount;
+      els.trackFlash.classList.remove('on'); els.trackFlash.classList.add('signal');
+      els.trackToast.classList.add('signal');
+      els.trackToast.textContent = meanInControl === false ? 'X̄ OUT OF CONTROL' : (method === 'S' ? 'S OUT OF CONTROL' : 'R OUT OF CONTROL');
+      els.trackToast.classList.add('show');
+      setTimeout(() => els.trackFlash.classList.remove('signal'), 260);
+      setTimeout(() => { els.trackToast.classList.remove('show'); els.trackToast.classList.remove('signal'); }, 900);
+    }
+
+    renderHud();
+    renderCharts();
+  }
+
+  function startTimer() { stopTimer(); if (running) sampleTimer = setInterval(tick, speedMs); }
+  function stopTimer() { if (sampleTimer) clearInterval(sampleTimer); sampleTimer = null; }
+
+  // ---------------- Wiring ----------------
+  function syncSliderLabels() {
+    els.meanVal.textContent = (+els.mean.value).toFixed(1);
+    els.sigmaVal.textContent = (+els.sigma.value).toFixed(1);
+    els.nVal.textContent = (+els.nSlider.value).toFixed(0);
+    els.uslVal.textContent = (+els.usl.value).toFixed(1);
+    els.lslVal.textContent = (+els.lsl.value).toFixed(1);
+    renderHud();
+    renderCharts();
+  }
+  [els.mean, els.sigma, els.usl, els.lsl].forEach(inp => inp.addEventListener('input', syncSliderLabels));
+
+  els.nSlider.addEventListener('input', () => {
+    // subgroup size changed — baseline & control-chart constants no longer apply, must re-baseline
+    baseline = null;
+    syncSliderLabels();
+  });
+
+  els.methodSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    els.methodSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+    method = btn.getAttribute('data-method');
+    baseline = null; // constants differ between methods — must re-baseline
+    renderHud();
+    renderCharts();
+  });
+
+  els.playBtn.addEventListener('click', () => {
+    running = !running;
+    els.playBtn.textContent = running ? 'Pause' : 'Play';
+    els.playBtn.classList.toggle('primary', running);
+    startTimer();
+  });
+
+  els.resetBtn.addEventListener('click', () => {
+    subgroups = []; sampleIndex = 0; crashCount = 0; signalCount = 0; baseline = null;
+    els.crashCount.textContent = '0'; els.signalCount.textContent = '0';
+    packCenterX = packTargetX = packPrevX = +els.mean.value;
+    renderHud(); renderCharts();
+  });
+
+  els.recalcBtn.addEventListener('click', () => {
+    const p = params();
+    const rows = subgroups.slice(-BASELINE_N);
+    if (rows.length < 2) return;
+    baseline = computeBaseline(rows, p.n, method === 'S');
+    signalCount = 0; els.signalCount.textContent = '0';
+    renderHud(); renderCharts();
+  });
+
+  els.speedSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    els.speedSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+    speedMs = +btn.getAttribute('data-speed');
+    startTimer();
+  });
+
+  const presets = {
+    capable:   { mean: 50, sigma: 2.5, usl: 65, lsl: 35 },
+    offcenter: { mean: 58, sigma: 2.5, usl: 65, lsl: 35 },
+    highvar:   { mean: 50, sigma: 6,   usl: 65, lsl: 35 },
+  };
+  els.presetsRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-preset]'); if (!btn) return;
+    const cfg = presets[btn.getAttribute('data-preset')];
+    els.mean.value = cfg.mean; els.sigma.value = cfg.sigma; els.usl.value = cfg.usl; els.lsl.value = cfg.lsl;
+    syncSliderLabels();
+  });
+
+  window.addEventListener('resize', setupCanvas);
+
+  // ---------------- Init ----------------
+  syncSliderLabels();
+  setupCanvas();
+  renderHud();
+  renderCharts();
+  startTimer();
+  requestAnimationFrame(draw);
+})();
+</script>
