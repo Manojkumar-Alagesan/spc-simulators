@@ -1,47 +1,47 @@
 <title>Trackside — SPC Capability Speedway</title>
 <style>
   .sp-root {
-    --plane:      #0A0C10;
-    --panel:      #12151B;
-    --panel-2:    #171B22;
-    --panel-3:    #1D222B;
-    --text-primary:   #F3F1E8;
-    --text-secondary: #9BA3AE;
-    --text-muted:     #626A76;
-    --border:         rgba(243,241,232,0.08);
-    --border-strong:  rgba(243,241,232,0.16);
+    --plane:      #F3F5F8;
+    --panel:      #FFFFFF;
+    --panel-2:    #F6F8FA;
+    --panel-3:    #EEF1F5;
+    --text-primary:   #16202A;
+    --text-secondary: #49525E;
+    --text-muted:     #7C8694;
+    --border:         rgba(22,32,42,0.09);
+    --border-strong:  rgba(22,32,42,0.18);
 
-    --accent:     #35C7DA;
-    --accent-ink: #06181B;
-    --accent-2:   #E8A23A;
+    --accent:     #2451B0;
+    --accent-ink: #FFFFFF;
+    --accent-2:   #B8720A;
 
-    --road:       #2B2E33;
-    --shoulder:   #14201A;
-    --shoulder-2: #0F1712;
-    --paint:      #E7E3D6;
-    --curb-a:     #D9433B;
-    --curb-b:     #F3F1E8;
+    --road:       #E3E7EC;
+    --shoulder:   #EEF1EC;
+    --shoulder-2: #E7EBE7;
+    --paint:      #2B333C;
+    --curb-a:     #CF222E;
+    --curb-b:     #1F2937;
 
-    --good:       #4fd44f;
-    --warning:    #e0a733;
-    --serious:    #ec835a;
-    --critical:   #e05c5c;
-    --good-bg:     rgba(79,212,79,0.14);
-    --warning-bg:  rgba(224,167,51,0.14);
-    --serious-bg:  rgba(236,131,90,0.14);
-    --critical-bg: rgba(224,92,92,0.14);
+    --good:       #1a7f37;
+    --warning:    #9a6700;
+    --serious:    #bc4c00;
+    --critical:   #cf222e;
+    --good-bg:     rgba(26,127,55,0.10);
+    --warning-bg:  rgba(154,103,0,0.10);
+    --serious-bg:  rgba(188,76,0,0.10);
+    --critical-bg: rgba(207,34,46,0.10);
 
     --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
 
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   * { box-sizing: border-box; }
 
   .sp-root {
     background:
-      radial-gradient(ellipse at 50% -10%, #16202A 0%, var(--plane) 55%);
+      radial-gradient(ellipse at 50% -10%, #E9EEF6 0%, var(--plane) 55%);
     color: var(--text-primary);
     font-family: var(--font-body);
     padding: clamp(18px, 3.5vw, 40px);
@@ -224,11 +224,11 @@
   #trackCanvas { display: block; width: 100%; height: 460px; background: var(--shoulder); }
   .track-flash {
     position: absolute; inset: 0; pointer-events: none;
-    box-shadow: inset 0 0 0 0 rgba(224,92,92,0);
+    box-shadow: inset 0 0 0 0 rgba(207,34,46,0);
     transition: box-shadow .15s ease;
   }
-  .track-flash.on { box-shadow: inset 0 0 60px 8px rgba(224,92,92,0.55); }
-  .track-flash.signal { box-shadow: inset 0 0 44px 6px rgba(224,167,51,0.45); }
+  .track-flash.on { box-shadow: inset 0 0 60px 8px rgba(207,34,46,0.32); }
+  .track-flash.signal { box-shadow: inset 0 0 44px 6px rgba(154,103,0,0.28); }
   .track-toast {
     position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
     font-family: var(--font-mono); font-size: 12px; font-weight: 700;
@@ -277,7 +277,7 @@
     position: absolute; pointer-events: none;
     background: var(--panel-3); border: 1px solid var(--border-strong);
     border-radius: 8px; padding: 7px 10px; font-size: 11.5px; color: var(--text-secondary);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 16px rgba(16,24,32,0.15);
     opacity: 0; transform: translate(-50%, -100%); white-space: nowrap; z-index: 5;
     transition: opacity .1s ease;
   }
@@ -634,7 +634,7 @@
     ctx.rotate(angle);
     const w = 22, h = 40;
     // shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillStyle = 'rgba(16,24,32,0.18)';
     ctx.beginPath();
     ctx.ellipse(0, h * 0.42, w * 0.62, 6, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -707,7 +707,7 @@
 
     const roadLeft = dims.w * 0.08, roadWidth = dims.w * 0.84;
     // shoulder texture (dashes)
-    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.strokeStyle = 'rgba(16,24,32,0.05)';
     ctx.lineWidth = 10;
     for (let i = -1; i < dims.h / 26 + 1; i++) {
       const yy = i * 26 + (scrollOffset % 26);
