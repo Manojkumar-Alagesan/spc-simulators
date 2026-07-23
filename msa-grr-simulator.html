@@ -1,0 +1,916 @@
+<meta charset="utf-8">
+<title>MSA Range — Gage R&amp;R</title>
+<style>
+  .sp-root {
+    --plane:      #F3F5F8;
+    --panel:      #FFFFFF;
+    --panel-2:    #F6F8FA;
+    --panel-3:    #EEF1F5;
+    --text-primary:   #16202A;
+    --text-secondary: #49525E;
+    --text-muted:     #7C8694;
+    --border:         rgba(22,32,42,0.09);
+    --border-strong:  rgba(22,32,42,0.18);
+
+    --accent:     #2451B0;
+    --accent-ink: #FFFFFF;
+
+    --op-a: #2451B0;
+    --op-b: #B8720A;
+    --op-c: #0F7B8A;
+
+    --good:       #1a7f37;
+    --serious:    #bc4c00;
+    --critical:   #cf222e;
+    --good-bg:     rgba(26,127,55,0.10);
+    --serious-bg:  rgba(188,76,0,0.10);
+    --critical-bg: rgba(207,34,46,0.10);
+
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  .sp-root {
+    background: radial-gradient(ellipse at 50% -10%, #E9EEF6 0%, var(--plane) 55%);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: clamp(18px, 3.5vw, 40px);
+    min-height: 100%;
+  }
+
+  .sp-shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  .sp-header {
+    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+    gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--border-strong);
+  }
+  .sp-eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+  .sp-title { font-weight: 800; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  .sp-subtitle { font-size: 13.5px; color: var(--text-secondary); margin: 6px 0 0; max-width: 56ch; }
+  .sp-stats { font-family: var(--font-mono); display: flex; gap: 22px; }
+  .sp-stat { text-align: right; }
+  .sp-stat .n { font-size: 26px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .sp-stat .n.signal { color: var(--critical); }
+  .sp-stat .l { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); max-width: 16ch; }
+
+  .controls-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .controls-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .transport { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    font-size: 13px; font-weight: 600; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--panel-2); color: var(--text-primary);
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn-ghost {
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-secondary); background: transparent;
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; cursor: pointer;
+  }
+  .btn-ghost:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+  .methodseg { display: inline-flex; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+  .methodseg button {
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-secondary); background: transparent;
+    border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer;
+  }
+  .methodseg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .methodseg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .sliders-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 20px; }
+  @media (max-width: 760px) { .sliders-grid { grid-template-columns: repeat(2, 1fr); } }
+  .slider-field { display: flex; flex-direction: column; gap: 6px; }
+  .slider-field label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--text-secondary); }
+  .slider-field .sv { font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .slider-field input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 3px; background: var(--border-strong); outline: none; }
+  .slider-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent);
+    border: 2px solid var(--panel); cursor: pointer; margin-top: -6px;
+  }
+  .slider-field input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); cursor: pointer; }
+  .slider-field input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .slider-hint { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; }
+  .method-field { display: flex; flex-direction: column; gap: 6px; }
+  .method-field label { font-size: 12px; color: var(--text-secondary); }
+
+  .main-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; align-items: start; }
+  @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .card-title { font-size: 14.5px; font-weight: 700; margin: 0; }
+  .card-sub { font-size: 11.5px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  .target-wrap { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-strong); }
+  #targetCanvas { display: block; width: 100%; height: 460px; background: var(--panel-2); }
+
+  .op-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-secondary); }
+  .op-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .op-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  .hud-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .hud-tile { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; display: flex; flex-direction: column; gap: 4px; }
+  .hud-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+  .hud-value { font-family: var(--font-mono); font-size: 23px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .hud-badge {
+    align-self: flex-start; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 20px; margin-top: 2px; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .hud-badge.good { background: var(--good-bg); color: var(--good); }
+  .hud-badge.serious { background: var(--serious-bg); color: var(--serious); }
+  .hud-badge.critical { background: var(--critical-bg); color: var(--critical); }
+  .hud-badge::before { content: "●"; font-size: 8px; }
+  .hud-tile.wide { grid-column: 1 / -1; }
+  .hud-hint { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; margin-top: 1px; }
+
+  .meter-row { display: flex; flex-direction: column; gap: 3px; }
+  .meter-row-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); }
+  .meter-row-top b { font-family: var(--font-mono); color: var(--text-primary); }
+  .meter-track { position: relative; height: 7px; border-radius: 4px; background: var(--panel-3); overflow: visible; }
+  .meter-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 4px; background: var(--accent); transition: width .2s ease; }
+  .meter-ref { position: absolute; top: -2px; width: 1px; height: 11px; background: var(--text-muted); opacity: 0.6; }
+
+  .chart-axis-label { font-family: var(--font-mono); font-size: 9.5px; }
+  .chart-key { display: flex; gap: 12px 14px; flex-wrap: wrap; font-size: 11px; color: var(--text-secondary); }
+  .chart-key span { display: inline-flex; align-items: center; gap: 5px; }
+  .chart-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .chart-block { display: flex; flex-direction: column; gap: 4px; }
+  .chart-block-title { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-secondary); }
+  .chart-svg-wrap { position: relative; }
+  .chart-svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .viz-tooltip {
+    position: absolute; pointer-events: none; background: var(--panel-3); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 7px 10px; font-size: 11.5px; color: var(--text-secondary);
+    box-shadow: 0 4px 16px rgba(16,24,32,0.15); opacity: 0; transform: translate(-50%, -100%);
+    white-space: nowrap; z-index: 5; transition: opacity .1s ease;
+  }
+  .viz-tooltip.show { opacity: 1; }
+  .viz-tooltip .tt-title { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .viz-tooltip .tt-val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .hud-value, .meter-fill { transition: none !important; }
+  }
+</style>
+
+<div class="sp-root">
+  <div class="sp-shell">
+
+    <header class="sp-header">
+      <div>
+        <p class="sp-eyebrow">MSA — Gage R&amp;R</p>
+        <h1 class="sp-title">Bullseye: Gage R&amp;R Range</h1>
+        <p class="sp-subtitle">Each part has a true value (its bullseye distance from nominal). Operators repeatedly "shoot" — measure — the same parts. Cluster tightness = repeatability (EV); a cluster shifted between operators = reproducibility (AV); how far parts sit from nominal = part-to-part variation (PV).</p>
+      </div>
+      <div class="sp-stats">
+        <div class="sp-stat">
+          <div class="n" id="studyCount">0</div>
+          <div class="l">Repeats run (same setup)</div>
+        </div>
+        <div class="sp-stat">
+          <div class="n signal" id="unacceptableCount">0</div>
+          <div class="l">...came back unacceptable</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="controls-card">
+      <div class="controls-top">
+        <div class="transport">
+          <button class="btn primary" id="runBtn" type="button">Repeat this study</button>
+          <button class="btn" id="resetBtn" type="button">Clear repeats</button>
+        </div>
+        <div class="presets" role="group" aria-label="Scenario presets">
+          <button class="btn-ghost" data-preset="good">Good gage</button>
+          <button class="btn-ghost" data-preset="marginal">Marginal gage</button>
+          <button class="btn-ghost" data-preset="poorRepeat">Poor repeatability</button>
+          <button class="btn-ghost" data-preset="poorReproduce">Poor reproducibility</button>
+        </div>
+      </div>
+      <p class="slider-hint" style="max-width:none;">"Repeat this study" doesn't collect new data — it re-samples the exact same true EV/AV/PV settings, as if you ran the identical 10-part study again. It shows how much a single small Gage R&amp;R study's %GRR and ndc can swing by chance alone, not a process changing over time.</p>
+
+      <div class="sliders-grid">
+        <div class="slider-field">
+          <label>Repeatability σ (EV source) <span class="sv" id="evVal">0.20</span></label>
+          <input type="range" id="evSlider" min="0.05" max="3" step="0.05" value="0.2">
+          <span class="slider-hint">Trial-to-trial noise for the same operator on the same part — the gage's own scatter.</span>
+        </div>
+        <div class="slider-field">
+          <label>Reproducibility σ (AV source) <span class="sv" id="avVal">0.15</span></label>
+          <input type="range" id="avSlider" min="0" max="3" step="0.05" value="0.15">
+          <span class="slider-hint">Systematic offset each operator carries — how differently operators center their shots.</span>
+        </div>
+        <div class="slider-field">
+          <label>Part-to-part σ (PV source) <span class="sv" id="pvVal">3.0</span></label>
+          <input type="range" id="pvSlider" min="0.2" max="8" step="0.1" value="3">
+          <span class="slider-hint">True spread of part values around nominal — the real process variation being measured.</span>
+        </div>
+        <div class="slider-field">
+          <label>Parts (n) <span class="sv" id="partsVal">10</span></label>
+          <input type="range" id="partsSlider" min="5" max="10" step="1" value="10">
+          <span class="slider-hint">AIAG recommends ≥5 parts spanning the process range.</span>
+        </div>
+        <div class="method-field">
+          <label>Operators (a)</label>
+          <div class="methodseg" id="opSeg" role="group" aria-label="Number of operators">
+            <button type="button" data-val="2" aria-pressed="false">2</button>
+            <button type="button" data-val="3" aria-pressed="true">3</button>
+          </div>
+        </div>
+        <div class="method-field">
+          <label>Trials (r)</label>
+          <div class="methodseg" id="trialSeg" role="group" aria-label="Trials per part per operator">
+            <button type="button" data-val="2" aria-pressed="false">2</button>
+            <button type="button" data-val="3" aria-pressed="true">3</button>
+          </div>
+        </div>
+        <div class="slider-field">
+          <label>Tolerance width (USL−LSL) <span class="sv" id="tolVal">20.0</span></label>
+          <input type="range" id="tolSlider" min="2" max="40" step="0.5" value="20">
+          <span class="slider-hint">Dashed ring on the target — used for %Tolerance (P/T ratio).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <section class="card" aria-label="Range view">
+        <div class="card-head">
+          <div>
+            <p class="card-title">Live range — shared target</p>
+            <p class="card-sub">Bullseye = nominal. Each part gets its own angular slice (P1…Pn); within a slice, each operator's shots cluster near their own angle. Distance from center = |measured value|. Dashed ring = ±tolerance/2.</p>
+          </div>
+        </div>
+        <div class="target-wrap">
+          <canvas id="targetCanvas"></canvas>
+        </div>
+        <div class="op-legend" id="opLegend"></div>
+      </section>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <section class="card" aria-label="Gage R&R readout">
+          <div class="card-head">
+            <div>
+              <p class="card-title">Gage R&amp;R readout</p>
+              <p class="card-sub">AIAG MSA (4th ed.) Average &amp; Range method — K1/K2/K3 factors, current study</p>
+            </div>
+          </div>
+          <div class="hud-grid" id="hudGrid"></div>
+        </section>
+
+        <section class="card" aria-label="Operator by part interaction">
+          <div class="card-head">
+            <div>
+              <p class="card-title">Operator × part interaction</p>
+              <p class="card-sub">Each operator's average measurement per part, current study. Parallel lines = no interaction · a consistent vertical offset = pure operator bias (AV) · crossing lines = an operator×part interaction.</p>
+            </div>
+          </div>
+          <div class="op-legend" id="interactionLegend"></div>
+          <div class="chart-svg-wrap" id="interactionChartWrap"></div>
+        </section>
+
+        <section class="card" aria-label="Run-to-run variability">
+          <div class="card-head">
+            <div>
+              <p class="card-title">Run-to-run variability</p>
+              <p class="card-sub" id="historyCount">0 repeats of this identical setup</p>
+            </div>
+          </div>
+          <div class="chart-key">
+            <span><i style="background:var(--good)"></i>Acceptable</span>
+            <span><i style="background:var(--serious)"></i>Marginal</span>
+            <span><i style="background:var(--critical)"></i>Unacceptable</span>
+          </div>
+          <div class="chart-block">
+            <span class="chart-block-title">%GRR across repeats of this setup — 10 / 30 reference lines</span>
+            <div class="chart-svg-wrap" id="grrChartWrap"></div>
+          </div>
+          <div class="chart-block">
+            <span class="chart-block-title">ndc across repeats of this setup — reference line at 5</span>
+            <div class="chart-svg-wrap" id="ndcChartWrap"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const root = document.querySelector('.sp-root');
+  const cs = getComputedStyle(root);
+  const tok = (name) => cs.getPropertyValue(name).trim();
+
+  // AIAG MSA (4th ed.) Average & Range method constants
+  const K1 = { 2: 4.56, 3: 3.05 };                                     // trials -> EV factor
+  const K2 = { 2: 3.65, 3: 2.70 };                                     // operators -> AV factor
+  const K3 = { 2: 3.65, 3: 2.70, 4: 2.30, 5: 2.08, 6: 1.93, 7: 1.82, 8: 1.74, 9: 1.67, 10: 1.62 }; // parts -> PV factor
+  const TOL_MULTIPLIER = 5.15; // 99% coverage convention for %Tolerance (P/T)
+
+  const els = {
+    ev: document.getElementById('evSlider'),
+    av: document.getElementById('avSlider'),
+    pv: document.getElementById('pvSlider'),
+    parts: document.getElementById('partsSlider'),
+    tol: document.getElementById('tolSlider'),
+    evVal: document.getElementById('evVal'),
+    avVal: document.getElementById('avVal'),
+    pvVal: document.getElementById('pvVal'),
+    partsVal: document.getElementById('partsVal'),
+    tolVal: document.getElementById('tolVal'),
+    opSeg: document.getElementById('opSeg'),
+    trialSeg: document.getElementById('trialSeg'),
+    runBtn: document.getElementById('runBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    presetsRow: document.querySelector('.presets'),
+    studyCount: document.getElementById('studyCount'),
+    unacceptableCount: document.getElementById('unacceptableCount'),
+    hudGrid: document.getElementById('hudGrid'),
+    opLegend: document.getElementById('opLegend'),
+    interactionLegend: document.getElementById('interactionLegend'),
+    interactionChartWrap: document.getElementById('interactionChartWrap'),
+    grrChartWrap: document.getElementById('grrChartWrap'),
+    ndcChartWrap: document.getElementById('ndcChartWrap'),
+    historyCount: document.getElementById('historyCount'),
+    canvas: document.getElementById('targetCanvas'),
+  };
+
+  // ---------------- State ----------------
+  let operators = 3;
+  let trials = 3;
+  let history = [];       // lightweight {i, pctGRR, ndc} entries for the run-to-run charts
+  let current = null;     // latest study (always live, drives target + HUD)
+  let studyCount = 0;
+  let unacceptableCount = 0;
+
+  function params() {
+    return {
+      sigEV: +els.ev.value,
+      sigAV: +els.av.value,
+      sigPV: +els.pv.value,
+      parts: +els.parts.value,
+      tol: +els.tol.value,
+      operators, trials,
+    };
+  }
+
+  // ---------------- RNG ----------------
+  function normalSample(mean, sigma) {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    return mean + z * sigma;
+  }
+  const mean = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+
+  // ---------------- Gage R&R study (Average & Range method) ----------------
+  function runOneStudy(p) {
+    const { sigEV, sigAV, sigPV, parts, tol, operators, trials } = p;
+    const partTrue = Array.from({ length: parts }, () => normalSample(0, sigPV));
+    const opBias = Array.from({ length: operators }, () => normalSample(0, sigAV));
+
+    const cells = [];
+    for (let a = 0; a < operators; a++) {
+      for (let pi = 0; pi < parts; pi++) {
+        const vals = Array.from({ length: trials }, () => partTrue[pi] + opBias[a] + normalSample(0, sigEV));
+        cells.push({ op: a, part: pi, vals });
+      }
+    }
+
+    const cellRanges = cells.map(c => Math.max(...c.vals) - Math.min(...c.vals));
+    const Rbar = mean(cellRanges);
+    const EV = Rbar * K1[trials];
+
+    const opAvgs = Array.from({ length: operators }, (_, a) => mean(cells.filter(c => c.op === a).flatMap(c => c.vals)));
+    const Xdiff = Math.max(...opAvgs) - Math.min(...opAvgs);
+    const avInner = Math.pow(Xdiff * K2[operators], 2) - (EV * EV) / (parts * trials);
+    const AV = avInner > 0 ? Math.sqrt(avInner) : 0;
+
+    const GRR = Math.sqrt(EV * EV + AV * AV);
+
+    const partAvgs = Array.from({ length: parts }, (_, pi) => mean(cells.filter(c => c.part === pi).flatMap(c => c.vals)));
+    const Rp = Math.max(...partAvgs) - Math.min(...partAvgs);
+    const PV = Rp * K3[parts];
+
+    const TV = Math.sqrt(GRR * GRR + PV * PV);
+    const pct = (x) => TV > 0 ? 100 * x / TV : 0;
+    const pctEV = pct(EV), pctAV = pct(AV), pctGRR = pct(GRR), pctPV = pct(PV);
+    const pctTol = tol > 0 ? 100 * (TOL_MULTIPLIER * GRR) / tol : null;
+    const ndc = GRR > 0 ? Math.floor(1.41 * (PV / GRR)) : Infinity;
+
+    return { cells, partAvgs, EV, AV, GRR, PV, TV, pctEV, pctAV, pctGRR, pctPV, pctTol, ndc, p };
+  }
+
+  // ---------------- Verdicts (AIAG guidance bands) ----------------
+  function verdictPct(v) {
+    if (v == null || !isFinite(v)) return { cls: 'critical', label: 'N/A' };
+    if (v < 10) return { cls: 'good', label: 'Acceptable' };
+    if (v <= 30) return { cls: 'serious', label: 'Marginal' };
+    return { cls: 'critical', label: 'Unacceptable' };
+  }
+  function verdictNdc(v) {
+    if (!isFinite(v)) return { cls: 'good', label: 'Excellent' };
+    if (v >= 5) return { cls: 'good', label: 'Acceptable' };
+    if (v >= 2) return { cls: 'serious', label: 'Marginal' };
+    return { cls: 'critical', label: 'Poor' };
+  }
+
+  const fmt2 = (n) => (n == null || !isFinite(n)) ? '—' : n.toFixed(2);
+  const fmt1 = (n) => (n == null || !isFinite(n)) ? '—' : n.toFixed(1);
+  const fmtNdc = (n) => !isFinite(n) ? '∞' : (n > 50 ? '50+' : String(n));
+
+  // ---------------- HUD ----------------
+  function meterRow(label, value, refs) {
+    const pctClamped = Math.max(0, Math.min(100, value == null ? 0 : value));
+    const refMarks = (refs || []).map(r => `<div class="meter-ref" style="left:${r}%"></div>`).join('');
+    return `
+      <div class="meter-row">
+        <div class="meter-row-top"><span>${label}</span><b>${value == null ? '—' : value.toFixed(1) + '%'}</b></div>
+        <div class="meter-track">${refMarks}<div class="meter-fill" style="width:${pctClamped}%"></div></div>
+      </div>`;
+  }
+
+  function renderHud() {
+    if (!current) return;
+    const c = current;
+    const grrBadge = verdictPct(c.pctGRR);
+    const tolBadge = verdictPct(c.pctTol);
+    const ndcBadge = verdictNdc(c.ndc);
+
+    els.hudGrid.innerHTML = `
+      <div class="hud-tile">
+        <span class="hud-label">EV (repeatability)</span>
+        <span class="hud-value">${fmt2(c.EV)}</span>
+        <span class="hud-badge" style="visibility:hidden">.</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">AV (reproducibility)</span>
+        <span class="hud-value">${fmt2(c.AV)}</span>
+        <span class="hud-badge" style="visibility:hidden">.</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">PV (part-to-part)</span>
+        <span class="hud-value">${fmt2(c.PV)}</span>
+        <span class="hud-badge" style="visibility:hidden">.</span>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">GRR (EV &amp; AV combined)</span>
+        <span class="hud-value">${fmt2(c.GRR)}</span>
+        <span class="hud-badge ${grrBadge.cls}">${grrBadge.label}</span>
+      </div>
+      <div class="hud-tile wide">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;">
+          <div>
+            <span class="hud-label">ndc</span>
+            <div><span class="hud-value">${fmtNdc(c.ndc)}</span> <span class="hud-badge ${ndcBadge.cls}">${ndcBadge.label}</span></div>
+          </div>
+          <span class="hud-hint" style="max-width:32ch; text-align:right;">Distinct part groups this gage can resolve — not vs. spec (see %Tolerance).</span>
+        </div>
+        <div class="chart-svg-wrap"><svg class="chart-svg" id="ndcComb" role="img"></svg></div>
+      </div>
+      <div class="hud-tile">
+        <span class="hud-label">%Tolerance (5.15·GRR / tol)</span>
+        <span class="hud-value">${fmt1(c.pctTol)}%</span>
+        <span class="hud-badge ${tolBadge.cls}">${tolBadge.label}</span>
+      </div>
+      <div class="hud-tile wide">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${meterRow('%EV of TV', c.pctEV)}
+          ${meterRow('%AV of TV', c.pctAV)}
+          ${meterRow('%GRR of TV (%Study Variation)', c.pctGRR, [10, 30])}
+          ${meterRow('%PV of TV', c.pctPV)}
+        </div>
+      </div>
+    `;
+    renderNdcComb(c);
+  }
+
+  // Draws ndc as a ruler: the observed part-average span sliced into `ndc`
+  // equal, alternating-shaded segments (the "least count" of this gage
+  // against these parts), with each part's real average plotted on top.
+  function renderNdcComb(study) {
+    const svg = document.getElementById('ndcComb');
+    if (!svg) return;
+    const W = 420, H = 78, padL = 8, padR = 8, barY = 20, barH = 22;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+    const { tol } = study.p;
+    const { GRR } = study;
+    const vals = study.partAvgs;
+    const partLo = Math.min(...vals), partHi = Math.max(...vals);
+    // shared axis: wide enough to hold both the tested parts (PV) and the tolerance band, so the two are directly comparable
+    let lo = Math.min(partLo, -tol / 2), hi = Math.max(partHi, tol / 2);
+    if (lo === hi) { lo -= 1; hi += 1; }
+    const pad = (hi - lo) * 0.08 || 0.5;
+    lo -= pad; hi += pad;
+    const x = (v) => padL + (v - lo) / (hi - lo) * (W - padL - padR);
+
+    const segsCap = 20;
+    const segs = Math.max(1, Math.min(isFinite(study.ndc) ? study.ndc : segsCap, segsCap));
+    const capped = !isFinite(study.ndc) || study.ndc > segsCap;
+    const partX0 = x(partLo), partX1 = x(partHi);
+
+    let html = '';
+    // ndc ticks span only the observed part spread (PV) — the ruler ndc is actually built from
+    for (let i = 0; i < segs; i++) {
+      const x0 = partX0 + i / segs * (partX1 - partX0);
+      const x1 = partX0 + (i + 1) / segs * (partX1 - partX0);
+      html += `<rect x="${x0.toFixed(1)}" y="${barY}" width="${Math.max(0.5, x1 - x0).toFixed(1)}" height="${barH}" fill="${i % 2 === 0 ? tok('--panel-3') : tok('--panel')}" stroke="${tok('--border-strong')}" stroke-width="0.75"/>`;
+    }
+    // tolerance band — dashed bracket at ±tol/2 on the SAME axis, so its width vs. the PV ticks is directly visible
+    const xTolLo = x(-tol / 2), xTolHi = x(tol / 2);
+    [xTolLo, xTolHi].forEach(xx => {
+      html += `<line x1="${xx.toFixed(1)}" y1="${barY - 6}" x2="${xx.toFixed(1)}" y2="${barY + barH + 6}" stroke="${tok('--critical')}" stroke-width="1.4" stroke-dasharray="4 3" opacity="0.75"/>`;
+    });
+    html += `<text x="${((xTolLo + xTolHi) / 2).toFixed(1)}" y="${barY - 9}" text-anchor="middle" class="chart-axis-label" fill="${tok('--critical')}" opacity="0.85">tolerance</text>`;
+
+    vals.forEach((v, pi) => {
+      const cx = x(v);
+      html += `<circle cx="${cx.toFixed(1)}" cy="${barY + barH / 2}" r="3.6" fill="${tok('--accent')}" stroke="${tok('--panel')}" stroke-width="1"><title>P${pi + 1}: ${v.toFixed(2)}</title></circle>`;
+    });
+
+    const ndcTolRaw = GRR > 0 ? Math.floor(1.41 * (tol / GRR)) : Infinity;
+    const line1 = capped
+      ? `showing ${segs} of ${fmtNdc(study.ndc)} groups resolvable across the tested parts (PV)`
+      : `${segs} group${segs === 1 ? '' : 's'} resolvable across the tested parts (PV)`;
+    const line2 = `same gage vs. the tolerance band instead: ~${fmtNdc(ndcTolRaw)} groups (illustrative, not an AIAG metric — compare with %Tolerance = ${fmt1(study.pctTol)}%)`;
+    html += `<text x="${padL}" y="${barY + barH + 16}" class="chart-axis-label" fill="${tok('--text-muted')}">${line1}</text>`;
+    html += `<text x="${padL}" y="${barY + barH + 28}" class="chart-axis-label" fill="${tok('--text-muted')}">${line2}</text>`;
+
+    svg.innerHTML = html;
+  }
+
+  function renderLegend() {
+    const colors = [tok('--op-a'), tok('--op-b'), tok('--op-c')];
+    let html = '';
+    for (let a = 0; a < operators; a++) {
+      html += `<span><i style="background:${colors[a]}"></i>Operator ${String.fromCharCode(65 + a)}</span>`;
+    }
+    els.opLegend.innerHTML = html;
+    els.interactionLegend.innerHTML = html;
+  }
+
+  // ---------------- Target canvas ----------------
+  let dims = { w: 0, h: 0, dpr: 1 };
+  const ctx = els.canvas.getContext('2d');
+
+  function setupCanvas() {
+    const rect = els.canvas.getBoundingClientRect();
+    dims.dpr = window.devicePixelRatio || 1;
+    dims.w = rect.width; dims.h = rect.height;
+    els.canvas.width = Math.round(dims.w * dims.dpr);
+    els.canvas.height = Math.round(dims.h * dims.dpr);
+    ctx.setTransform(dims.dpr, 0, 0, dims.dpr, 0, 0);
+  }
+
+  function drawTarget(study) {
+    if (!study) return;
+    const cx = dims.w / 2, cy = dims.h / 2;
+    const maxR = Math.min(dims.w, dims.h) * 0.44;
+    const { parts, tol } = study.p;
+
+    let maxAbsVal = 0;
+    study.cells.forEach(c => c.vals.forEach(v => { if (Math.abs(v) > maxAbsVal) maxAbsVal = Math.abs(v); }));
+    const viewSpan = Math.max(maxAbsVal * 1.15, tol / 2 * 1.1, 0.5);
+    const scale = maxR / viewSpan;
+
+    ctx.clearRect(0, 0, dims.w, dims.h);
+    ctx.fillStyle = tok('--panel-2');
+    ctx.fillRect(0, 0, dims.w, dims.h);
+
+    // concentric reference rings
+    [1, 0.75, 0.5, 0.25].forEach((f, idx) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR * f, 0, Math.PI * 2);
+      ctx.fillStyle = idx % 2 === 0 ? tok('--panel-3') : tok('--panel');
+      ctx.fill();
+    });
+    [1, 0.75, 0.5, 0.25].forEach((f) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR * f, 0, Math.PI * 2);
+      ctx.strokeStyle = tok('--border-strong');
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+
+    // part slice dividers + labels
+    ctx.strokeStyle = tok('--border');
+    ctx.lineWidth = 1;
+    for (let pi = 0; pi < parts; pi++) {
+      const boundary = -Math.PI / 2 - Math.PI / parts + pi * (2 * Math.PI / parts);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(boundary) * maxR, cy + Math.sin(boundary) * maxR);
+      ctx.stroke();
+
+      const labelAngle = -Math.PI / 2 + pi * (2 * Math.PI / parts);
+      const lx = cx + Math.cos(labelAngle) * (maxR + 13);
+      const ly = cy + Math.sin(labelAngle) * (maxR + 13);
+      ctx.fillStyle = tok('--text-muted');
+      ctx.font = '10px ' + tok('--font-mono');
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('P' + (pi + 1), lx, ly);
+    }
+
+    // tolerance ring
+    if (tol / 2 * scale <= maxR + 2) {
+      ctx.save();
+      ctx.setLineDash([6, 5]);
+      ctx.strokeStyle = tok('--critical');
+      ctx.globalAlpha = 0.6;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(cx, cy, tol / 2 * scale, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // bullseye
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.fillStyle = tok('--text-primary');
+    ctx.fill();
+
+    // shots
+    const colors = [tok('--op-a'), tok('--op-b'), tok('--op-c')];
+    const sliceHalf = Math.PI / parts;
+    study.cells.forEach(c => {
+      const base = -Math.PI / 2 + c.part * (2 * Math.PI / parts);
+      const opOffset = (c.op - (study.p.operators - 1) / 2) * sliceHalf * 0.55;
+      c.vals.forEach(v => {
+        const jitter = (Math.random() - 0.5) * sliceHalf * 0.18;
+        const angle = base + opOffset + jitter;
+        const r = Math.min(maxR - 3, scale * Math.abs(v));
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = colors[c.op];
+        ctx.globalAlpha = 0.82;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = tok('--panel');
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+    });
+  }
+
+  // ---------------- Operator × part interaction chart (SVG) ----------------
+  function renderInteractionChart(study) {
+    const wrap = els.interactionChartWrap;
+    const W = 460, H = 190, padL = 40, padR = 14, padT = 14, padB = 26;
+    const svgNS = 'http://www.w3.org/2000/svg';
+    let svg = wrap.querySelector('svg');
+    if (!svg) { svg = document.createElementNS(svgNS, 'svg'); svg.setAttribute('class', 'chart-svg'); svg.setAttribute('role', 'img'); wrap.insertBefore(svg, wrap.firstChild); }
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+    const { parts, operators, tol } = study.p;
+    const colors = [tok('--op-a'), tok('--op-b'), tok('--op-c')];
+
+    const opPartAvg = Array.from({ length: operators }, (_, a) =>
+      Array.from({ length: parts }, (_, pi) => {
+        const cell = study.cells.find(c => c.op === a && c.part === pi);
+        return mean(cell.vals);
+      })
+    );
+
+    const allVals = opPartAvg.flat();
+    let lo = Math.min(...allVals, -tol / 2);
+    let hi = Math.max(...allVals, tol / 2);
+    const pad = (hi - lo) * 0.15 || 1;
+    lo -= pad; hi += pad;
+
+    const x = (pi) => padL + (parts <= 1 ? (W - padL - padR) / 2 : (pi / (parts - 1)) * (W - padL - padR));
+    const y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+
+    let html = '';
+    [tol / 2, -tol / 2].forEach(v => {
+      const yy = y(v);
+      html += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W - padR}" y2="${yy.toFixed(1)}" stroke="${tok('--critical')}" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.45"/>`;
+    });
+    const y0 = y(0);
+    html += `<line x1="${padL}" y1="${y0.toFixed(1)}" x2="${W - padR}" y2="${y0.toFixed(1)}" stroke="${tok('--text-muted')}" stroke-width="1" stroke-dasharray="2 4" opacity="0.6"/>`;
+    html += `<text x="${padL}" y="${(y0 - 4).toFixed(1)}" class="chart-axis-label" fill="${tok('--text-muted')}">nominal</text>`;
+
+    for (let pi = 0; pi < parts; pi++) {
+      html += `<text x="${x(pi).toFixed(1)}" y="${H - 8}" text-anchor="middle" class="chart-axis-label" fill="${tok('--text-muted')}">P${pi + 1}</text>`;
+    }
+
+    const tooltip = makeTooltip(wrap);
+    for (let a = 0; a < operators; a++) {
+      let path = '';
+      for (let pi = 0; pi < parts; pi++) path += (pi === 0 ? 'M' : 'L') + x(pi).toFixed(1) + ',' + y(opPartAvg[a][pi]).toFixed(1) + ' ';
+      html += `<path d="${path}" fill="none" stroke="${colors[a]}" stroke-width="1.8" opacity="0.85" stroke-linejoin="round"/>`;
+      for (let pi = 0; pi < parts; pi++) {
+        const cx = x(pi), cy = y(opPartAvg[a][pi]);
+        html += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.4" fill="${colors[a]}" stroke="${tok('--panel')}" stroke-width="1"/>`;
+        html += `<circle class="pt-hit" data-op="${a}" data-part="${pi}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="9" fill="transparent" tabindex="0"/>`;
+      }
+    }
+
+    svg.innerHTML = html;
+    svg.querySelectorAll('.pt-hit').forEach((hit) => {
+      const a = +hit.getAttribute('data-op'), pi = +hit.getAttribute('data-part');
+      function activate() {
+        const rect = wrap.getBoundingClientRect();
+        const px = (+hit.getAttribute('cx') / W) * rect.width;
+        const py = (+hit.getAttribute('cy') / H) * rect.height;
+        tooltip.show(px, py - 8, 'Operator ' + String.fromCharCode(65 + a) + ' — P' + (pi + 1), opPartAvg[a][pi].toFixed(2), colors[a]);
+      }
+      hit.addEventListener('pointerenter', activate);
+      hit.addEventListener('pointermove', activate);
+      hit.addEventListener('pointerleave', () => tooltip.hide());
+      hit.addEventListener('focus', activate);
+      hit.addEventListener('blur', () => tooltip.hide());
+    });
+  }
+
+  // ---------------- History run charts (SVG) ----------------
+  function makeTooltip(wrap) {
+    let el = wrap.querySelector('.viz-tooltip');
+    if (!el) { el = document.createElement('div'); el.className = 'viz-tooltip'; wrap.appendChild(el); }
+    return {
+      show(x, y, title, value, color) {
+        el.innerHTML = `<div class="tt-title">${title}</div><div class="tt-val" style="color:${color}">${value}</div>`;
+        el.style.left = x + 'px'; el.style.top = y + 'px'; el.classList.add('show');
+      },
+      hide() { el.classList.remove('show'); }
+    };
+  }
+
+  function renderRunChart(wrap, data, opts) {
+    const W = 460, H = 150, padL = 34, padR = 10, padT = 10, padB = 20;
+    const svgNS = 'http://www.w3.org/2000/svg';
+    let svg = wrap.querySelector('svg');
+    if (!svg) { svg = document.createElementNS(svgNS, 'svg'); svg.setAttribute('class', 'chart-svg'); svg.setAttribute('role', 'img'); wrap.insertBefore(svg, wrap.firstChild); }
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('aria-label', opts.label + ': ' + data.length + ' points');
+
+    if (data.length === 0) { svg.innerHTML = ''; return; }
+
+    const vals = data.map(opts.getValue).map(v => isFinite(v) ? v : opts.capValue);
+    let lo = 0;
+    let hi = Math.max(...vals, ...(opts.refLines || []));
+    hi = hi * 1.15 || 1;
+    const pad = (hi - lo) * 0.1 || 1;
+    hi += pad;
+
+    const x = (i) => padL + (data.length <= 1 ? 0 : (i / Math.max(data.length - 1, 1)) * (W - padL - padR));
+    const y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+
+    let html = '';
+    (opts.refLines || []).forEach(rv => {
+      const yy = y(rv);
+      html += `<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W - padR}" y2="${yy.toFixed(1)}" stroke="${tok('--text-muted')}" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>`;
+      html += `<text x="${W - padR}" y="${(yy - 3).toFixed(1)}" text-anchor="end" class="chart-axis-label" fill="${tok('--text-muted')}">${rv}</text>`;
+    });
+
+    if (data.length > 1) {
+      let path = '';
+      data.forEach((d, i) => {
+        const v = isFinite(opts.getValue(d)) ? opts.getValue(d) : opts.capValue;
+        path += (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(v).toFixed(1) + ' ';
+      });
+      html += `<path d="${path}" fill="none" stroke="${tok('--accent')}" stroke-width="1.6" opacity="0.5" stroke-linejoin="round"/>`;
+    }
+
+    data.forEach((d, i) => {
+      const raw = opts.getValue(d);
+      const v = isFinite(raw) ? raw : opts.capValue;
+      const cx = x(i), cy = y(v);
+      const badge = opts.getBadge(d);
+      const color = tok('--' + badge.cls);
+      html += `<circle class="pt" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.2" fill="${color}" stroke="${tok('--panel')}" stroke-width="1"/>`;
+      html += `<circle class="pt-hit" data-i="${i}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="10" fill="transparent" tabindex="0"/>`;
+    });
+
+    svg.innerHTML = html;
+    const tooltip = makeTooltip(wrap);
+    svg.querySelectorAll('.pt-hit').forEach((hit) => {
+      const i = +hit.getAttribute('data-i');
+      const d = data[i];
+      const badge = opts.getBadge(d);
+      function activate() {
+        const rect = wrap.getBoundingClientRect();
+        const px = (+hit.getAttribute('cx') / W) * rect.width;
+        const py = (+hit.getAttribute('cy') / H) * rect.height;
+        const color = tok('--' + badge.cls);
+        tooltip.show(px, py - 8, opts.label + ' — repeat #' + d.i, opts.fmtValue(d) + ' · ' + badge.label, color);
+      }
+      hit.addEventListener('pointerenter', activate);
+      hit.addEventListener('pointermove', activate);
+      hit.addEventListener('pointerleave', () => tooltip.hide());
+      hit.addEventListener('focus', activate);
+      hit.addEventListener('blur', () => tooltip.hide());
+    });
+  }
+
+  function renderHistoryCharts() {
+    const data = history; // already capped at 40 in regenerate()
+    renderRunChart(els.grrChartWrap, data, {
+      label: '%GRR',
+      getValue: (d) => d.pctGRR,
+      getBadge: (d) => verdictPct(d.pctGRR),
+      fmtValue: (d) => fmt1(d.pctGRR) + '%',
+      refLines: [10, 30],
+      capValue: 100,
+    });
+    renderRunChart(els.ndcChartWrap, data, {
+      label: 'ndc',
+      getValue: (d) => isFinite(d.ndc) ? d.ndc : 50,
+      getBadge: (d) => verdictNdc(d.ndc),
+      fmtValue: (d) => fmtNdc(d.ndc),
+      refLines: [5],
+      capValue: 50,
+    });
+    els.historyCount.textContent = history.length + ' repeat' + (history.length === 1 ? '' : 's') + ' of this identical setup';
+  }
+
+  // ---------------- Regenerate / tick ----------------
+  function regenerate(logToHistory) {
+    const p = params();
+    current = runOneStudy(p);
+    if (logToHistory) {
+      studyCount++;
+      history.push({ i: studyCount, pctGRR: current.pctGRR, ndc: current.ndc });
+      if (history.length > 40) history.shift(); // matches the last-40 window the charts display
+      if (current.pctGRR > 30) { unacceptableCount++; els.unacceptableCount.textContent = unacceptableCount; }
+      els.studyCount.textContent = studyCount;
+    }
+    renderHud();
+    renderLegend();
+    drawTarget(current);
+    renderInteractionChart(current);
+    renderHistoryCharts();
+  }
+
+  // ---------------- Wiring ----------------
+  function syncSliderLabels() {
+    els.evVal.textContent = (+els.ev.value).toFixed(2);
+    els.avVal.textContent = (+els.av.value).toFixed(2);
+    els.pvVal.textContent = (+els.pv.value).toFixed(1);
+    els.partsVal.textContent = (+els.parts.value).toFixed(0);
+    els.tolVal.textContent = (+els.tol.value).toFixed(1);
+    clearHistory();
+    regenerate(false);
+  }
+  [els.ev, els.av, els.pv, els.parts, els.tol].forEach(inp => inp.addEventListener('input', syncSliderLabels));
+
+  els.opSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    els.opSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+    operators = +btn.getAttribute('data-val');
+    clearHistory();
+    regenerate(false);
+  });
+
+  els.trialSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    els.trialSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+    trials = +btn.getAttribute('data-val');
+    clearHistory();
+    regenerate(false);
+  });
+
+  els.runBtn.addEventListener('click', () => regenerate(true));
+
+  function clearHistory() {
+    history = []; studyCount = 0; unacceptableCount = 0;
+    els.studyCount.textContent = '0'; els.unacceptableCount.textContent = '0';
+    renderHistoryCharts();
+  }
+  els.resetBtn.addEventListener('click', clearHistory);
+
+  const presets = {
+    good:            { ev: 0.20, av: 0.15, pv: 3.0, tol: 20 },
+    marginal:        { ev: 0.60, av: 0.50, pv: 3.0, tol: 20 },
+    poorRepeat:      { ev: 2.00, av: 0.20, pv: 3.0, tol: 20 },
+    poorReproduce:   { ev: 0.30, av: 1.80, pv: 3.0, tol: 20 },
+  };
+  els.presetsRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-preset]'); if (!btn) return;
+    const cfg = presets[btn.getAttribute('data-preset')];
+    els.ev.value = cfg.ev; els.av.value = cfg.av; els.pv.value = cfg.pv; els.tol.value = cfg.tol;
+    syncSliderLabels();
+  });
+
+  window.addEventListener('resize', () => { setupCanvas(); drawTarget(current); });
+
+  // ---------------- Init ----------------
+  setupCanvas();
+  syncSliderLabels();
+  regenerate(true);
+})();
+</script>

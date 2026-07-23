@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SPC Simulators</title>
+<title>Quality Engineering Simulators</title>
 <style>
   :root {
     --plane: #F3F5F8;
@@ -27,13 +27,17 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     padding: clamp(24px, 5vw, 64px);
   }
-  .shell { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  .shell { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
   .eyebrow {
     font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
     font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px;
   }
   h1 { font-size: clamp(26px, 4vw, 34px); font-weight: 800; letter-spacing: -0.01em; margin: 0; }
   p.lede { font-size: 14.5px; color: var(--text-secondary); max-width: 56ch; line-height: 1.5; margin: 10px 0 0; }
+  .section { display: flex; flex-direction: column; gap: 14px; }
+  .section-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .section-title { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; margin: 0; }
+  .section-desc { font-size: 13px; color: var(--text-secondary); max-width: 58ch; line-height: 1.5; margin: 0; }
   .cards { display: flex; flex-direction: column; gap: 14px; }
   a.card {
     display: block;
@@ -62,22 +66,42 @@
 <body>
   <div class="shell">
     <div>
-      <p class="eyebrow">SPC Simulators</p>
-      <h1>Statistical Process Control, visualized</h1>
-      <p class="lede">Interactive capability and control-chart simulators. Each one runs standalone in your browser — adjust the process, watch the charts and control limits react live.</p>
+      <p class="eyebrow">Quality Engineering Simulators</p>
+      <h1>SPC &amp; MSA, visualized</h1>
+      <p class="lede">Interactive simulators covering two related but distinct disciplines: SPC monitors whether a process stays in control over time, while MSA checks whether the measurement system itself is trustworthy enough to feed that monitoring. Each one runs standalone in your browser — adjust the inputs, watch the charts react live.</p>
     </div>
 
-    <div class="cards">
-      <a class="card" href="spc-individuals-chart.html">
-        <p class="card-title">Individuals (I-MR) capability simulator <span class="arrow">&rarr;</span></p>
-        <p class="card-desc">One measurement at a time. Live Cp/Cpk/Pp/Ppk against AIAG bands, plus I-MR control limits computed from a moving-range baseline.</p>
-        <div class="card-tags"><span class="tag">Cp / Cpk</span><span class="tag">Pp / Ppk</span><span class="tag">I-MR chart</span></div>
-      </a>
-      <a class="card" href="spc-subgroups-chart.html">
-        <p class="card-title">Subgroups (X̄–R / X̄–S) capability simulator <span class="arrow">&rarr;</span></p>
-        <p class="card-desc">Rational subgroups of n parts per sample. Short-term Cp/Cpk from R̄/d2 or s̄/c4, overall Pp/Ppk from pooled individuals, and real X̄ and R/S control charts.</p>
-        <div class="card-tags"><span class="tag">Cp / Cpk</span><span class="tag">Pp / Ppk</span><span class="tag">X̄–R chart</span><span class="tag">X̄–S chart</span></div>
-      </a>
+    <div class="section">
+      <div class="section-head">
+        <p class="section-title">SPC — Statistical Process Control</p>
+        <p class="section-desc">Capability and control-chart simulators. Is the process centered, stable, and within spec?</p>
+      </div>
+      <div class="cards">
+        <a class="card" href="spc-individuals-chart.html">
+          <p class="card-title">Individuals (I-MR) capability simulator <span class="arrow">&rarr;</span></p>
+          <p class="card-desc">One measurement at a time. Live Cp/Cpk/Pp/Ppk against AIAG bands, plus I-MR control limits computed from a moving-range baseline.</p>
+          <div class="card-tags"><span class="tag">Cp / Cpk</span><span class="tag">Pp / Ppk</span><span class="tag">I-MR chart</span></div>
+        </a>
+        <a class="card" href="spc-subgroups-chart.html">
+          <p class="card-title">Subgroups (X̄–R / X̄–S) capability simulator <span class="arrow">&rarr;</span></p>
+          <p class="card-desc">Rational subgroups of n parts per sample. Short-term Cp/Cpk from R̄/d2 or s̄/c4, overall Pp/Ppk from pooled individuals, and real X̄ and R/S control charts.</p>
+          <div class="card-tags"><span class="tag">Cp / Cpk</span><span class="tag">Pp / Ppk</span><span class="tag">X̄–R chart</span><span class="tag">X̄–S chart</span></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <p class="section-title">MSA — Measurement System Analysis</p>
+        <p class="section-desc">Gage R&amp;R and related studies. Before trusting the process data above, can you trust the gage that produced it?</p>
+      </div>
+      <div class="cards">
+        <a class="card" href="msa-grr-simulator.html">
+          <p class="card-title">Gage R&amp;R simulator <span class="arrow">&rarr;</span></p>
+          <p class="card-desc">Operators repeatedly measure the same parts on a shared archery-target view. Live EV/AV/PV/GRR, %GRR and ndc against AIAG bands, via the Average &amp; Range method.</p>
+          <div class="card-tags"><span class="tag">Repeatability (EV)</span><span class="tag">Reproducibility (AV)</span><span class="tag">%GRR</span><span class="tag">ndc</span></div>
+        </a>
+      </div>
     </div>
 
     <footer>Source on <a href="https://github.com/Manojkumar-Alagesan/spc-simulators">GitHub</a>.</footer>
